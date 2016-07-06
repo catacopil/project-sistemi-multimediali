@@ -1,0 +1,19 @@
+﻿<!DOCTYPE html >
+<html xmlns="http://www.w3.org/1999/xhtml">
+    <head>
+        <meta http-equiv="X-UA-Compatible" content="IE=9"/>
+        <style type="text/css" media="screen">
+        </style>
+        <script type="text/javascript">
+            function init() {
+                var canvas = document.getElementById("myCanvas");
+                var ctx = canvas.getContext("2d");
+                ctx.fillStyle = "rgb(0,0,255)";
+                ctx.fillRect(10, 10, 100, 100);
+            }
+        </script>
+    </head>
+    <body onload="init();">
+      <canvas id="myCanvas" width="100px" height="100px"></canvas>
+    </body>
+</html>
