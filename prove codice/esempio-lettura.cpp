@@ -17,8 +17,8 @@ void bin8(int n, char bina[])
 
 void DumpFile(char *Nf)
 {
-    unsigned char BitMap[64000L];
-    char dig[3], bina[8];
+	unsigned char BitMap[64000L];
+	char dig[3], bina[8];
     unsigned char d;
     int LungRow, nByte;
     int n=0, b=0,l;
@@ -36,6 +36,7 @@ void DumpFile(char *Nf)
     printf("---------------------------------------------\n");
     nByte=nBit/8;
     if (nByte<1) nByte=1;
+		//  da notare che fread legge un array di elementi dal file puntato da fpo 
     l=fread(BitMap, sizeof(unsigned char), LungRow, fpo);
     while (l == LungRow)
     {
@@ -63,7 +64,6 @@ void DumpFile(char *Nf)
         printf("\n");
         l=fread(BitMap, sizeof(unsigned char), LungRow, fpo);
     }
-    while (!feof(fpo));
     printf("------------------------------------------------");
     fclose(fpo);
 }
@@ -155,13 +155,13 @@ int main(int argc, char *argv[])
 {
    nBit=atoi(argv[1]);
    if (nBit==1)
-      InfoBMP(".\\bmp7x7_01bit.bmp");
+      InfoBMP("bmp7x7_01bit.bmp");
    else if (nBit==4)
-      InfoBMP(".\\bmp7x7_04bit.bmp");
+      InfoBMP("bmp7x7_04bit.bmp");
    else if (nBit==8)
-      InfoBMP(".\\bmp7x7_08bit.bmp");
+      InfoBMP("bmp7x7_08bit.bmp");
    else if (nBit==24)
-      InfoBMP(".\\bmp7x7_24bit.bmp");
+      InfoBMP("bmp7x7_24bit.bmp");
    else
       printf("Numeri ammessi: 1, 4, 8, 24");
 }
