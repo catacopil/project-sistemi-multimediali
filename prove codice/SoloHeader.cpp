@@ -1,68 +1,24 @@
-/*
-
-File programma principale
-
-*/
 
 #include <stdio.h>
 #include <stdlib.h>
 #include <string>
 #include <iostream>
 using namespace std;
-#include "Header.cpp"
-//#include "ImageMono.cpp"
-//#include "ImageRGB.cpp"
 
-/*
-String FILE_IN;
-String FILE_OUT;
-String COMANDO;
-int larghezzaPX, altezzaPX, larghezzaOUT, altezzaOUT;
-int offsetIMG;
-
-
-Header readHeader(String nomeFile){
-    // ritorna l'oggetto Header creato con i dati letti dalla linea di comando
-}
-
-ImageMono readMonoColorImage(String nomeFile, Header* header){
-    // crea un oggetto ImageMono che contiene la Bitmap dell'immagine monocolore
-}
-
-ImageRGB readRGBImage(String nomeFile, Header* header){
-    // crea un oggetto ImageRGB che contiene la Bitmap dell'immagine a colori 
-}*/
-
-void bin8(int n, char bina[])
-{
-     int i;
-     for (i=0 ; i < 8 ; i++)
-     {
-         bina[7-i]=(n % 2)+'0';
-         n = (n - (n % 2) ) /2;
-     }
-}
-
+/* 
+ * File che legge solo lo Header iniziale (primi 54 byte) e ne stampa il contenuto
+ * 
+ */
 
 int main(int argc, char *argv[]){
-    // considero gli argomenti passati da linea di comando
     
     char firma[2],piani[2];
     short color;
     int dimensione_totale, riservato, offset,header_size,larghezza, altezza,compressione,dimensione_immagine;
     int ris_orizzontale,ris_verticale,pallete1,pallete2,l;
     
-    char dig[3], bina[8];
+    char* nomeFile = "output.bmp";
     
-    
-    char* nomeFile = "bmp7x7_08bit.bmp";
-	char* nomeFileOut = "output.bmp";
-    Header* mioHeader = new Header(nomeFile);
-	mioHeader->stampaInfoHeader();
-	mioHeader->scriviHeader(nomeFileOut);
-	
-	
-	/*
     FILE *puntFile;
         puntFile = fopen(nomeFile,"rb");
         
@@ -126,46 +82,6 @@ int main(int argc, char *argv[]){
 	cout<<"Risoluzione verticale: "<<ris_verticale<<endl;
 	cout<<"Pallette: "<<pallete1<<endl;
 	cout<<"Pallette used: "<<pallete2<<endl;
-	
-	int LungRow=( (larghezza*color)+(32-(larghezza*color)%32) )/8;
-	fseek(puntFile,offset,0);
-	
-	unsigned char bitMap[LungRow*altezza];
-	
-	l=fread(bitMap, sizeof(unsigned char), LungRow, puntFile);
-	int riga=0,n=0,b=0;
-	 while (l == LungRow){
-	/*
-	      for ( n=0 ; n < LungRow ; n++)
-	    {
-		if ( (color==24) || (color==8) )
-		{
-		    if (b==0) printf("[");
-		    printf("%02X",bitMap[n+LungRow*riga]);
-		    if (b==(color-1)) printf("]");
-		    b=(b+1) % color;
-		}
-		else if (color==4)
-		{
-		    sprintf(dig, "%02X", bitMap[n+LungRow*riga]);
-		    printf("[%c] [%c] ",dig[0],dig[1]);
-		}
-		else if (color==1)
-		{
-		    l=(int)bitMap[n+LungRow*riga];
-		    bin8(l,bina);
-		    printf("[%s]",bina);
-		}
-	    }
-	    printf("\n");   */ /*
-	    riga++;
-	    l=fread(bitMap+LungRow*riga, sizeof(unsigned char), LungRow, puntFile);
 
-	 }
-			*/
-    
-    // leggo Header e creo la corrispondente classe di immagine (ImageRGB o ImageMono)
-		
-    // prendo l'offset dell'immagine e leggo la bitmap
 	cout << " -----   FINE  PROGRAMMA  ----- \n";
-    }
+}
