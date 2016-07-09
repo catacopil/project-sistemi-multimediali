@@ -15,6 +15,7 @@ private:
     short color;
     int dimensione_totale, riservato, offset, header_size, larghezza, altezza, compressione, dimensione_immagine;
     int ris_orizzontale,ris_verticale,pallete1,pallete2,l;
+	bool esistePalette;
     
 public:
     Header(char* nomeFile){				// Costruttore che legge l'intero Header (si presume sia quello standard da 54 Byte)
@@ -28,6 +29,9 @@ public:
         
 		fseek(puntFile, 0, 0);
 		fread(headerContent, DIM_HEADER_INIZIALE, 1, puntFile);		// leggo l'intero header e lo metto in headerContent
+		cout << "Header letto: \n";
+		for (int i=0; i<DIM_HEADER_INIZIALE; i++)
+			cout << i<<") "<< headerContent[i]<<endl;
 		
 		fseek(puntFile, 0, 0);
 		fread(firma,2, 1, puntFile);
@@ -55,6 +59,10 @@ public:
 		
 		fseek(puntFile,28,0);
 		fread(&color,sizeof(int), 1, puntFile);
+		if (color==24)
+			esistePalette = false;
+		else 
+			esistePalette = true;
 		
 		fseek(puntFile,30,0);
 		fread(&compressione,sizeof(int), 1, puntFile);
@@ -73,10 +81,24 @@ public:
 		
 		fseek(puntFile,50,0);
 		fread(&pallete2,sizeof(int), 1, puntFile);
-		fclose(puntFile);											// chiusura del file
+		
+		// lettura palette
+		if (esistePalette){
+			bool palette_standard = (offset == (14+header_size+DIM_PALETTE));
+			if (palette_standard){
+				cout << "Ok, palette standard \n";
+				fseek(puntFile, DIM_PALETTE, 0);
+				fread(paletteContent, DIM_PALETTE, 1, puntFile);
+			}
+			else
+				cout << "Attenzione: dimensione Palette diversa da "<<DIM_PALETTE<<endl;
 		}
+		
+		
+		fclose(puntFile);											// chiusura del file
+	}
 
-	int getDimensione(){					// get e set per le dimensioni e l'offset immagine
+	int getDimensioneTot(){					// get e set per le dimensioni e l'offset immagine
 		return dimensione_totale;
 	}
 	
@@ -86,6 +108,10 @@ public:
 	
 	int getAltezza(){
 		return altezza;
+	}
+	
+	int getColor(){
+		return color;
 	}
 	
 	int getOffsetIMG(){
@@ -104,7 +130,7 @@ public:
 		offset = newOffset;
 	}
 		
-	void setDimensione(int newDim){
+	void setDimensioneTot(int newDim){
 		dimensione_totale = newDim;
 	}
 	
@@ -115,10 +141,10 @@ public:
 		cout<<"Reserved: "<<riservato<<endl;
 		cout<<"Offset: "<<offset<<endl;
 		cout<<"Header size: "<<header_size<<endl;
-		cout<<"Larghezza: "<<larghezza<<endl;
-		cout<<"Altezza: "<<altezza<<endl;
+		cout<<"Larghezza: "<<larghezza<< " px"<<endl;
+		cout<<"Altezza: "<<altezza<< " px"<<endl;
 		cout<<"Piani: "<<piani[0]<<piani[1]<<endl;
-		cout<<"Colori: "<<color<<endl;
+		cout<<"Colori: "<<color <<" bit"<<endl;
 		cout<<"Compressione: "<<compressione<<endl;
 		cout<<"Dimensione immagine: "<<dimensione_immagine<<endl;
 		cout<<"Risoluzione orizzontale: "<<ris_orizzontale<<endl;
@@ -136,7 +162,10 @@ public:
 			cout << "Errore nell'apertura del file " << nomeFile << " !\n";
 			exit(1);
 			}
+		fseek(puntFile, 0, 0);
 		fwrite(headerContent, DIM_HEADER_INIZIALE, 1, puntFile);			// scrive nel file tutto lo Header
+		if (esistePalette)
+			fwrite(paletteContent, DIM_PALETTE, 1, puntFile);					// scrive nel file la Palette
 		
 		// qua devo riscrivere le informazioni che potrebbero essere cambiate, ad es. le dimensioni
 		

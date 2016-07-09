@@ -47,125 +47,84 @@ void bin8(int n, char bina[])
 int main(int argc, char *argv[]){
     // considero gli argomenti passati da linea di comando
     
-    char firma[2],piani[2];
-    short color;
-    int dimensione_totale, riservato, offset,header_size,larghezza, altezza,compressione,dimensione_immagine;
-    int ris_orizzontale,ris_verticale,pallete1,pallete2,l;
+    short headerColor;
+    int headerOffset, headerLarg, headerAlt, headerDimIMG;
     
-    char dig[3], bina[8];
-    
-    
-    char* nomeFile = "bmp7x7_08bit.bmp";
-	char* nomeFileOut = "output.bmp";
-    Header* mioHeader = new Header(nomeFile);
+    char* nomeFileIn = "img/kimi512.bmp";
+	char* nomeFileOut = "img/output.bmp";
+    Header* mioHeader = new Header(nomeFileIn);
 	mioHeader->stampaInfoHeader();
-	mioHeader->scriviHeader(nomeFileOut);
 	
+	// prendo i dati dello header
+	headerLarg = mioHeader->getLarghezza();
+	headerAlt = mioHeader->getAltezza();
+	headerColor = mioHeader->getColor();
+	headerOffset = mioHeader->getOffsetIMG();
 	
-	/*
-    FILE *puntFile;
-        puntFile = fopen(nomeFile,"rb");
-        
-	fseek(puntFile, 0, 0);
-	fread(firma,2, 1, puntFile);
+	// lettura della bitMap
+	int LungRow;
+	int LungRowData = (headerLarg*headerColor)/8;												// Byte per riga, con solo i pixel (senza zeri)
+	if (LungRowData%4 !=0)
+		LungRow=( (headerLarg*headerColor)+(32-(headerLarg*headerColor)%32) )/8;				// Byte per riga, compresi gli zeri
+	else
+		LungRow = LungRowData;
 	
-	fseek(puntFile,2,0);
-	fread(&dimensione_totale, 1, sizeof(int), puntFile);
+	// TODO: attenzione, LungRow e LungRowData rappresentano byte, definiti così vanno bene se sono nel caso RGB (perché ho 1 o 3 byte per pixel)
 	
-	fseek(puntFile,6,0);
-	fread(&riservato, 1, sizeof(int), puntFile);
-	
-	fseek(puntFile,10,0);
-	fread(&offset, 1, sizeof(int), puntFile);
-	
-	fseek(puntFile,14,0);
-	fread(&header_size,sizeof(int), 1, puntFile);
-	
-	fseek(puntFile,18,0);
-	fread(&larghezza,sizeof(int), 1, puntFile);
-	
-	fseek(puntFile,22,0);
-	fread(&altezza,sizeof(int), 1, puntFile);
-	
-	fseek(puntFile,26,0);
-	fread(piani,2, 1, puntFile);
-	
-	fseek(puntFile,28,0);
-	fread(&color,sizeof(int), 1, puntFile);
-	
-	fseek(puntFile,30,0);
-	fread(&compressione,sizeof(int), 1, puntFile);
-	
-	fseek(puntFile,34,0);
-	fread(&dimensione_immagine,sizeof(int), 1, puntFile);
-	
-	fseek(puntFile,38,0);
-	fread(&ris_orizzontale,sizeof(int), 1, puntFile);
-	
-	fseek(puntFile,42,0);
-	fread(&ris_verticale,sizeof(int), 1, puntFile);
-	
-	fseek(puntFile,46,0);
-	fread(&pallete1,sizeof(int), 1, puntFile);
-	
-	fseek(puntFile,50,0);
-	fread(&pallete2,sizeof(int), 1, puntFile);
-
-	cout<<"Firma: "<<firma[0]<<firma[1]<<endl;
-	cout<<"Dimensione totale: "<<dimensione_totale<<endl;
-	cout<<"Reserved: "<<riservato<<endl;
-	cout<<"Offset: "<<offset<<endl;
-	cout<<"Header size: "<<header_size<<endl;
-	cout<<"Larghezza: "<<larghezza<<endl;
-	cout<<"Altezza: "<<altezza<<endl;
-	cout<<"Piani: "<<piani[0]<<piani[1]<<endl;
-	cout<<"Colori: "<<color<<endl;
-	cout<<"Compressione: "<<compressione<<endl;
-	cout<<"Dimensione immagine: "<<dimensione_immagine<<endl;
-	cout<<"Risoluzione orizzontale: "<<ris_orizzontale<<endl;
-	cout<<"Risoluzione verticale: "<<ris_verticale<<endl;
-	cout<<"Pallette: "<<pallete1<<endl;
-	cout<<"Pallette used: "<<pallete2<<endl;
-	
-	int LungRow=( (larghezza*color)+(32-(larghezza*color)%32) )/8;
-	fseek(puntFile,offset,0);
-	
-	unsigned char bitMap[LungRow*altezza];
-	
-	l=fread(bitMap, sizeof(unsigned char), LungRow, puntFile);
-	int riga=0,n=0,b=0;
-	 while (l == LungRow){
-	/*
-	      for ( n=0 ; n < LungRow ; n++)
-	    {
-		if ( (color==24) || (color==8) )
-		{
-		    if (b==0) printf("[");
-		    printf("%02X",bitMap[n+LungRow*riga]);
-		    if (b==(color-1)) printf("]");
-		    b=(b+1) % color;
+	FILE *puntFile;
+    puntFile = fopen(nomeFileIn,"rb");
+	if(puntFile == NULL) {
+		cout << "Errore nell'apertura del file " << nomeFileIn << " !\n";
+		exit(1);
 		}
-		else if (color==4)
-		{
-		    sprintf(dig, "%02X", bitMap[n+LungRow*riga]);
-		    printf("[%c] [%c] ",dig[0],dig[1]);
+	fseek(puntFile, headerOffset, 0);
+	unsigned char rigaBitMap[LungRow];
+	unsigned char bitMap[LungRowData*headerAlt];
+	
+	int l=fread(rigaBitMap, sizeof(unsigned char), LungRow, puntFile);
+	for(int i=0; i<LungRowData; i++)			// copio i dati che mi interessano nella bitMap
+		bitMap[i] = rigaBitMap[i];
+		
+	int riga=0;
+	while (l == LungRow){
+		riga++;
+		l=fread(rigaBitMap, sizeof(unsigned char), LungRow, puntFile);		// leggo la riga di dati dal file
+		for(int i=0; i<LungRowData; i++){									// copio in bitMap i dati sui pixel
+			bitMap[LungRowData*riga+i] = rigaBitMap[i];
+			//cout << " "<< bitMap[LungRowData*riga+i];
 		}
-		else if (color==1)
-		{
-		    l=(int)bitMap[n+LungRow*riga];
-		    bin8(l,bina);
-		    printf("[%s]",bina);
+		//cout <<"\n";
+	}
+	fclose(puntFile);
+    
+    // applicazione di qualche filtro by Umberto
+	// eventuali modifiche nello header
+    
+    // scrittura dello header e della bitMap
+	mioHeader->scriviHeader(nomeFileOut);			// scrittura header (anche la Palette)
+	puntFile = fopen(nomeFileOut, "wb");
+	if(puntFile == NULL) {
+		cout << "Errore nell'apertura del file " << nomeFileIn << " !\n";
+		exit(1);
 		}
-	    }
-	    printf("\n");   */ /*
-	    riga++;
-	    l=fread(bitMap+LungRow*riga, sizeof(unsigned char), LungRow, puntFile);
-
-	 }
-			*/
+	cout << "LungRow: " << LungRow << " LungRowData: " << LungRowData <<" \t larghezza in px: "<< headerLarg <<endl;
+	fseek(puntFile, headerOffset, 0);
+	
+	// per ogni riga devo aggiungere alla fine degli zeri
+	for(int i=0; i<headerAlt; i++){						// scorro tutte le righe
+		unsigned char riga[LungRow] = {0};				// inizializzo a zero
+		for(int j=0; j<LungRowData; j++)				// assegno i valori della bitMap ai primi byte (i rimanenti saranno a zero)
+			riga[j] = bitMap[i*LungRowData+j];
+		fwrite(riga, LungRow, 1, puntFile);				// scrivo la riga nel file
+	}
+	
+	fclose(puntFile);
+	
+	
+	
+	
     
     // leggo Header e creo la corrispondente classe di immagine (ImageRGB o ImageMono)
-		
-    // prendo l'offset dell'immagine e leggo la bitmap
+	// prendo l'offset dell'immagine e leggo la bitmap
 	cout << " -----   FINE  PROGRAMMA  ----- \n";
     }

@@ -135,9 +135,8 @@ int main(int argc, char *argv[]){
 	l=fread(bitMap, sizeof(unsigned char), LungRow, puntFile);
 	int riga=0,n=0,b=0;
 	 while (l == LungRow){
- /*
-	      for ( n=0 ; n < LungRow ; n++)
-	    {
+/*
+	for ( n=0 ; n < LungRow ; n++){
 		if ( (color==24) || (color==8) )
 		{
 		    if (b==0) printf("[");
@@ -156,7 +155,7 @@ int main(int argc, char *argv[]){
 		    bin8(l,bina);
 		    printf("[%s]",bina);
 		}
-	    }
+	}
 	    printf("\n");
 */
 	    riga++;
