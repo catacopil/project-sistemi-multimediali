@@ -12,6 +12,7 @@
 #include <string>
 #include <iostream>
 #include "Header.cpp"
+#include "BitMapRGB.cpp"
 #include "ImageFilter.cpp"
 
 using namespace std;
@@ -28,71 +29,13 @@ int main(int argc, char *argv[]){
     Header* mioHeader = new Header(nomeFileIn);
 	mioHeader->stampaInfoHeader();
 	
-	// prendo i dati dello header
-	headerLarg = mioHeader->getLarghezza();
-	headerAlt = mioHeader->getAltezza();
-	headerColor = mioHeader->getColor();
-	headerOffset = mioHeader->getOffsetIMG();
+	// creo la bitMap che viene letta direttamente dal file indicato
+	BitMapRGB* mioBitMap = new BitMapRGB(nomeFileIn, mioHeader->getOffsetIMG(), mioHeader->getLarghezza(), mioHeader->getAltezza());
 	
-	// lettura della bitMap
-	int LungRow;
-	int LungRowData = (headerLarg*headerColor)/8;												// Byte per riga, con solo i pixel (senza zeri)
-	if (LungRowData%4 !=0)
-		LungRow=( (headerLarg*headerColor)+(32-(headerLarg*headerColor)%32) )/8;				// Byte per riga, compresi gli zeri
-	else
-		LungRow = LungRowData;
-	
-	cout << "LungRow: " << LungRow << " LungRowData: " << LungRowData <<" \t larghezza in px: "<< headerLarg <<endl;
-	// TODO: attenzione, LungRow e LungRowData rappresentano byte, definiti così vanno bene se sono nel caso RGB (perché ho 1 o 3 byte per pixel)
-	
-	FILE *puntFile;
-    puntFile = fopen(nomeFileIn,"rb");
-	if(puntFile == NULL) {
-		cout << "Errore nell'apertura del file " << nomeFileIn << " !\n";
-		exit(1);
-		}
-	fseek(puntFile, headerOffset, 0);
-	unsigned char rigaBitMap[LungRow];
-	unsigned char bitMap[LungRowData*headerAlt];
-	
-	int l=fread(rigaBitMap, sizeof(unsigned char), LungRow, puntFile);
-	for(int i=0; i<LungRowData; i++)			// copio i dati che mi interessano nella bitMap
-		bitMap[i] = rigaBitMap[i];
-		
-	int riga=0;
-	while (l == LungRow){
-		riga++;
-		l=fread(rigaBitMap, sizeof(unsigned char), LungRow, puntFile);		// leggo la riga di dati dal file
-		for(int i=0; i<LungRowData; i++){									// copio in bitMap i dati sui pixel
-			bitMap[LungRowData*riga+i] = rigaBitMap[i];
-			//cout << " "<< bitMap[LungRowData*riga+i];
-		}
-		//cout <<"\n";
-	}
-	fclose(puntFile);
-
-    
-    // applicazione di qualche filtro by Umberto
-	// eventuali modifiche nello header
-    
-    // scrittura dello header e della bitMap
 	mioHeader->scriviHeader(nomeFileOut);			// scrittura header (anche la Palette se c'è)
 	
-	// scrittura della bitMap
-	ofstream fileout;
-	fileout.open(nomeFileOut, ios_base::app| ios::binary);
-
+	mioBitMap->scriviBitMap(nomeFileOut);			// stampo nel file di destinazione la bitMap
 	
-	// per ogni riga devo aggiungere alla fine degli zeri
-	for(int i=0; i<headerAlt; i++){						// scorro tutte le righe
-		unsigned char riga[LungRow];					// inizializzo a zero la riga della dimensione necessaria
-		for(int j=0; j<LungRowData; j++)				// assegno i valori della bitMap ai primi byte (i rimanenti saranno a zero)
-			riga[j] = bitMap[i*LungRowData+j];
-		streamsize dimensioneOut = LungRow;
-		fileout.write((const char*)riga, dimensioneOut);			// scrivo la riga nel file
-	
-	}
-	fileout.close();
 	
 	cout << " -----   FINE  PROGRAMMA  ----- \n";
 }
