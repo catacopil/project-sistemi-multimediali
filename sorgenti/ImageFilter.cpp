@@ -17,11 +17,11 @@
   unsigned char* ImageFilter::contrasto(double valore){
     
     double fattore=(259*(valore+255))/(255*(259-valore));
-    unsigned char pixel;
+    double pixel;
     
     for(int i=0; i<this->altezza*this->lunghezza*3;i++){
     
-      pixel=bitMap[i];
+      pixel=(int)bitMap[i];
       
       pixel=(fattore*(pixel-128)+128);
       
@@ -30,7 +30,7 @@
       if(pixel<0)
 	pixel=0;
       
-      bitMap[i]=pixel;
+      bitMap[i]=(unsigned char)pixel;
       
     }
     
@@ -40,19 +40,20 @@
   
   unsigned char* ImageFilter::luminosita(double valore){
     
-    unsigned char pixel;
+    double pixel;
     
  
     for(int i=0; i<this->altezza*this->lunghezza*3;i++){
     
-      pixel=bitMap[i];
-      pixel=(valore*pixel)/255;
-      if(pixel>255)
+      pixel=(int)bitMap[i];
+      pixel+=(valore*pixel)/255.0;
+     // pixel=pixel+valore;
+      if(pixel>=255)
 	pixel=255;
-      if(pixel<0)
+      if(pixel<=0)
 	pixel=0;
       
-      bitMap[i]=pixel;
+      bitMap[i]=(unsigned char)pixel;
       
     }
     
@@ -63,19 +64,20 @@
   
   unsigned char* ImageFilter::gamma(double valore){
     
-    unsigned char pixel;
+   double pixel;
     
     if(valore!=0){
-      double gamma= 1/valore;
+      double gamma=1/valore;
       for(int i=0; i<this->altezza*this->lunghezza*3;i++){
-	pixel=bitMap[i];
-	pixel=pow(pixel/255.0f, gamma);
-	pixel=pixel*255.0f;
+	pixel=(double)bitMap[i];;
+	pixel=pow(pixel/255.0, gamma);
+	pixel*=255.0;
 	if(pixel>255)
 	  pixel=255;
 	if(pixel<0)
 	  pixel=0;
-	bitMap[i]=pixel;
+	
+	bitMap[i]=(unsigned char)pixel;
       
     }
     
@@ -91,18 +93,18 @@
   
   unsigned char* ImageFilter::coloreInverso(){
     
-    unsigned char pixel;
+    int pixel;
     
     for(int i=0; i<this->altezza*this->lunghezza*3;i++){
     
-      pixel=bitMap[i];
+      pixel=(int)bitMap[i];
       pixel=255-pixel;
       if(pixel>255)
 	pixel=255;
       if(pixel<0)
 	pixel=0;
       
-      bitMap[i]=pixel;
+      bitMap[i]=(unsigned char)pixel;
       
     }
     
@@ -112,11 +114,11 @@
   
   unsigned char* ImageFilter::solarise(double soglia){
     
-    unsigned char pixel;
+    int pixel;
     
     for(int i=0; i<this->altezza*this->lunghezza*3;i++){
     
-      pixel=bitMap[i];
+      pixel=(int)bitMap[i];
       if(pixel<=soglia)
       {
       pixel=255-pixel;
@@ -125,7 +127,7 @@
       if(pixel<0)
 	pixel=0;
       
-      bitMap[i]=pixel;
+      bitMap[i]=(unsigned char)pixel;
       }
     }
     
