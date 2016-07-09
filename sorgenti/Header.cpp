@@ -6,9 +6,38 @@ using namespace std;
 
 #define DIM_HEADER_INIZIALE 54
 #define DIM_PALETTE 1024
+#define DIM_HEAD_BMP24 54
 
-class Header{
+static void CaricaBmp24(unsigned char* Headd, const char *Nome, unsigned char *Dove, int x, int y)
+{
+	FILE *fHan = fopen(Nome, "rb");
+	if(fHan == NULL) {
+		printf("errore!\n");
+		exit(1);
+	}
+
+	fread(Headd, DIM_HEAD_BMP24, 1, fHan);
+	fread(Dove, x * y * 3, 1, fHan);
+	fclose(fHan);
+}
+
+static void SalvaBmp24(unsigned char* Headd, const char *Nome, unsigned char *DaDove, int x, int y)
+{
+	FILE *fHan = fopen(Nome, "wb");
+	if(fHan == NULL) {
+		printf("errore!\n");
+		exit(1);
+	}
+
+	fwrite(Headd, DIM_HEAD_BMP24, 1, fHan);
+	fwrite(DaDove, x * y * 3, 1, fHan);
+	fclose(fHan);
+}
+
+class Header{	
 private:
+	unsigned char Headd[DIM_HEAD_BMP24];
+	unsigned char Dove[512*512*3];
     unsigned char headerContent[DIM_HEADER_INIZIALE];       // contiene tutti i byte dell'Header (ad eccezione della Palette)
     unsigned char paletteContent[DIM_PALETTE];				// contiene tutti i byte della Palette
 	char firma[2],piani[2];
@@ -94,11 +123,15 @@ public:
 				cout << "Attenzione: dimensione Palette diversa da "<<DIM_PALETTE<<endl;
 		}
 		
-		
 		fclose(puntFile);											// chiusura del file
+		
+		// PROVA LETTURA/SCRITTURA CON LE FUNZIONI DEL PROF
+		CaricaBmp24(Headd, nomeFile, Dove, larghezza, altezza);
+		
+		
 	}
 
-	int getDimensioneTot(){					// get e set per le dimensioni e l'offset immagine
+	int getDimensioneTot(){					// get e set per le dimensioni, i bit impiegati per ogni pixel e l'offset immagine
 		return dimensione_totale;
 	}
 	
@@ -156,6 +189,7 @@ public:
 	
 	void scriviHeader(char* nomeFile){	
 	// scrive l'Header nel nuovo file, a partire da quello che aveva letto inizialmente, riscrive sempre le dimensioni e l'offset immagine
+		/*
 		FILE *puntFile;
         puntFile = fopen(nomeFile,"wb");			// apre il file in modalità wb, se non esiste lo crea
 		if(puntFile == NULL) {
@@ -171,10 +205,11 @@ public:
 		
 		
 		fclose(puntFile);
+		*/
+		SalvaBmp24(Headd, nomeFile, Dove, larghezza, altezza);
+		
 	}
 };
-
-
 
 
 //TODO: fare classe Header con lettura/scrittura su file

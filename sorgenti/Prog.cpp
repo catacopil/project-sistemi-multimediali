@@ -51,7 +51,7 @@ int main(int argc, char *argv[]){
     int headerOffset, headerLarg, headerAlt, headerDimIMG;
     
     char* nomeFileIn = "img/kimi512.bmp";
-	char* nomeFileOut = "img/output.bmp";
+	char* nomeFileOut = "img/output.txt";
     Header* mioHeader = new Header(nomeFileIn);
 	mioHeader->stampaInfoHeader();
 	
@@ -65,7 +65,7 @@ int main(int argc, char *argv[]){
 	int LungRow;
 	int LungRowData = (headerLarg*headerColor)/8;												// Byte per riga, con solo i pixel (senza zeri)
 	if (LungRowData%4 !=0)
-		LungRow=( (headerLarg*headerColor)+(32-(headerLarg*headerColor)%32) )/8;				// Byte per riga, compresi gli zeri
+		LungRow=( (headerLarg*headerColor)+(32-(headerLarg*headerColor)%32) )/8;				// Byte per riga, compresi gli zeri aggiuntivi se LungRow non è divisibile per 4 byte
 	else
 		LungRow = LungRowData;
 	
