@@ -2,42 +2,14 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <iostream>
+#include <fstream>
 using namespace std;
 
 #define DIM_HEADER_INIZIALE 54
 #define DIM_PALETTE 1024
-#define DIM_HEAD_BMP24 54
 
-static void CaricaBmp24(unsigned char* Headd, const char *Nome, unsigned char *Dove, int x, int y)
-{
-	FILE *fHan = fopen(Nome, "rb");
-	if(fHan == NULL) {
-		printf("errore!\n");
-		exit(1);
-	}
-
-	fread(Headd, DIM_HEAD_BMP24, 1, fHan);
-	fread(Dove, x * y * 3, 1, fHan);
-	fclose(fHan);
-}
-
-static void SalvaBmp24(unsigned char* Headd, const char *Nome, unsigned char *DaDove, int x, int y)
-{
-	FILE *fHan = fopen(Nome, "wb");
-	if(fHan == NULL) {
-		printf("errore!\n");
-		exit(1);
-	}
-
-	fwrite(Headd, DIM_HEAD_BMP24, 1, fHan);
-	fwrite(DaDove, x * y * 3, 1, fHan);
-	fclose(fHan);
-}
-
-class Header{	
+class Header{
 private:
-	unsigned char Headd[DIM_HEAD_BMP24];
-	unsigned char Dove[512*512*3];
     unsigned char headerContent[DIM_HEADER_INIZIALE];       // contiene tutti i byte dell'Header (ad eccezione della Palette)
     unsigned char paletteContent[DIM_PALETTE];				// contiene tutti i byte della Palette
 	char firma[2],piani[2];
@@ -59,6 +31,8 @@ public:
 		fseek(puntFile, 0, 0);
 		fread(headerContent, DIM_HEADER_INIZIALE, 1, puntFile);		// leggo l'intero header e lo metto in headerContent
 		cout << "Header letto: \n";
+		
+		
 		for (int i=0; i<DIM_HEADER_INIZIALE; i++)
 			cout << i<<") "<< headerContent[i]<<endl;
 		
@@ -123,15 +97,11 @@ public:
 				cout << "Attenzione: dimensione Palette diversa da "<<DIM_PALETTE<<endl;
 		}
 		
+		
 		fclose(puntFile);											// chiusura del file
-		
-		// PROVA LETTURA/SCRITTURA CON LE FUNZIONI DEL PROF
-		CaricaBmp24(Headd, nomeFile, Dove, larghezza, altezza);
-		
-		
 	}
 
-	int getDimensioneTot(){					// get e set per le dimensioni, i bit impiegati per ogni pixel e l'offset immagine
+	int getDimensioneTot(){					// get e set per le dimensioni e l'offset immagine
 		return dimensione_totale;
 	}
 	
@@ -189,27 +159,52 @@ public:
 	
 	void scriviHeader(char* nomeFile){	
 	// scrive l'Header nel nuovo file, a partire da quello che aveva letto inizialmente, riscrive sempre le dimensioni e l'offset immagine
-		/*
-		FILE *puntFile;
+	/*	FILE *puntFile;
         puntFile = fopen(nomeFile,"wb");			// apre il file in modalità wb, se non esiste lo crea
 		if(puntFile == NULL) {
 			cout << "Errore nell'apertura del file " << nomeFile << " !\n";
 			exit(1);
 			}
 		fseek(puntFile, 0, 0);
-		fwrite(headerContent, DIM_HEADER_INIZIALE, 1, puntFile);			// scrive nel file tutto lo Header
-		if (esistePalette)
-			fwrite(paletteContent, DIM_PALETTE, 1, puntFile);					// scrive nel file la Palette
+		cout<<"AAAAAAAAAAAAAAAAAAAAAAA     "<<headerContent[0]<<endl;
+		char b[1]={'Z'};
+		
+		
+		
+		fwrite(b, 1, 1, puntFile);			// scrive nel file tutto lo Header
+		//if (esistePalette)*/
+	//		fwrite(paletteContent, DIM_PALETTE, 1, puntFile);					// scrive nel file la Palette
 		
 		// qua devo riscrivere le informazioni che potrebbero essere cambiate, ad es. le dimensioni
 		
 		
-		fclose(puntFile);
-		*/
-		SalvaBmp24(Headd, nomeFile, Dove, larghezza, altezza);
+		 ofstream fileout;
+		  fileout.open("output.bmp", ios::out | ios::binary);
+		  
+		streamsize out=header_size+14;
+		  
+		  fileout.write((const char*)headerContent,out);
+		  
+		    fileout.close();
+		  
+		  if (esistePalette){
+			fileout.open("output.bmp",  ios_base::app| ios::binary);
+			out=DIM_PALETTE;
+			fileout.write((const char*)paletteContent,out);
+			fileout.close();
+		  }
+		      
+		  fileout.close();
+		  
 		
+	//	fclose(puntFile);
+	//	
+
+
 	}
 };
+
+
 
 
 //TODO: fare classe Header con lettura/scrittura su file

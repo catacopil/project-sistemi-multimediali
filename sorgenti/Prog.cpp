@@ -10,6 +10,7 @@ File programma principale
 #include <iostream>
 using namespace std;
 #include "Header.cpp"
+#include "ImageFilter.cpp"
 //#include "ImageMono.cpp"
 //#include "ImageRGB.cpp"
 
@@ -50,8 +51,9 @@ int main(int argc, char *argv[]){
     short headerColor;
     int headerOffset, headerLarg, headerAlt, headerDimIMG;
     
-    char* nomeFileIn = "img/kimi512.bmp";
-	char* nomeFileOut = "img/output.txt";
+    char* nomeFileIn = "kimi512.bmp";
+    //char* nomeFileIn = "kimi512.bmp";
+	char* nomeFileOut = "output.bmp";
     Header* mioHeader = new Header(nomeFileIn);
 	mioHeader->stampaInfoHeader();
 	
@@ -65,7 +67,7 @@ int main(int argc, char *argv[]){
 	int LungRow;
 	int LungRowData = (headerLarg*headerColor)/8;												// Byte per riga, con solo i pixel (senza zeri)
 	if (LungRowData%4 !=0)
-		LungRow=( (headerLarg*headerColor)+(32-(headerLarg*headerColor)%32) )/8;				// Byte per riga, compresi gli zeri aggiuntivi se LungRow non è divisibile per 4 byte
+		LungRow=( (headerLarg*headerColor)+(32-(headerLarg*headerColor)%32) )/8;				// Byte per riga, compresi gli zeri
 	else
 		LungRow = LungRowData;
 	
@@ -98,10 +100,19 @@ int main(int argc, char *argv[]){
 	fclose(puntFile);
     
     // applicazione di qualche filtro by Umberto
+    
+  ImageFilter* img=new ImageFilter(bitMap,headerAlt,headerLarg);
+  unsigned char* bm=img->contrasto(1);
+  bm=bitMap;
+	
+    /*
+    
 	// eventuali modifiche nello header
     
     // scrittura dello header e della bitMap
 	mioHeader->scriviHeader(nomeFileOut);			// scrittura header (anche la Palette)
+	
+
 	puntFile = fopen(nomeFileOut, "wb");
 	if(puntFile == NULL) {
 		cout << "Errore nell'apertura del file " << nomeFileIn << " !\n";
@@ -112,7 +123,7 @@ int main(int argc, char *argv[]){
 	
 	// per ogni riga devo aggiungere alla fine degli zeri
 	for(int i=0; i<headerAlt; i++){						// scorro tutte le righe
-		unsigned char riga[LungRow] = {0};				// inizializzo a zero
+		unsigned char riga[LungRow];				// inizializzo a zero
 		for(int j=0; j<LungRowData; j++)				// assegno i valori della bitMap ai primi byte (i rimanenti saranno a zero)
 			riga[j] = bitMap[i*LungRowData+j];
 		fwrite(riga, LungRow, 1, puntFile);				// scrivo la riga nel file
@@ -120,6 +131,39 @@ int main(int argc, char *argv[]){
 	
 	fclose(puntFile);
 	
+	*/
+	
+    
+    
+    
+	    
+    // applicazione di qualche filtro by Umberto
+	// eventuali modifiche nello header
+    
+    // scrittura dello header e della bitMap
+	mioHeader->scriviHeader(nomeFileOut);			// scrittura header (anche la Palette)
+	
+	 ofstream fileout;
+		  fileout.open("output.bmp",  ios_base::app| ios::binary);
+		  
+
+		
+	cout << "LungRow: " << LungRow << " LungRowData: " << LungRowData <<" \t larghezza in px: "<< headerLarg <<endl;
+
+	
+	// per ogni riga devo aggiungere alla fine degli zeri
+	for(int i=0; i<headerAlt; i++){						// scorro tutte le righe
+		unsigned char riga[LungRow];				// inizializzo a zero
+		for(int j=0; j<LungRowData; j++)				// assegno i valori della bitMap ai primi byte (i rimanenti saranno a zero)
+			riga[j] = bitMap[i*LungRowData+j];
+		streamsize out=LungRow;
+		fileout.write((const char*)riga,out);
+		//fwrite(riga, LungRow, 1, puntFile);	
+		// scrivo la riga nel file
+	
+		
+	}
+	  fileout.close();
 	
 	
 	
