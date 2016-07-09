@@ -1,49 +1,20 @@
 /*
-
-File programma principale
-
+ * PROGETTO SISTEMI MULTIMEDIALI - a.a. 2015/1016
+ * 
+ * File programma principale, contiene il main
+ * 
+ * Autori: Catalin Copil, Umberto Martinati
+ * 
 */
 
 #include <stdio.h>
 #include <stdlib.h>
 #include <string>
 #include <iostream>
-using namespace std;
 #include "Header.cpp"
 #include "ImageFilter.cpp"
-//#include "ImageMono.cpp"
-//#include "ImageRGB.cpp"
 
-/*
-String FILE_IN;
-String FILE_OUT;
-String COMANDO;
-int larghezzaPX, altezzaPX, larghezzaOUT, altezzaOUT;
-int offsetIMG;
-
-
-Header readHeader(String nomeFile){
-    // ritorna l'oggetto Header creato con i dati letti dalla linea di comando
-}
-
-ImageMono readMonoColorImage(String nomeFile, Header* header){
-    // crea un oggetto ImageMono che contiene la Bitmap dell'immagine monocolore
-}
-
-ImageRGB readRGBImage(String nomeFile, Header* header){
-    // crea un oggetto ImageRGB che contiene la Bitmap dell'immagine a colori 
-}*/
-
-void bin8(int n, char bina[])
-{
-     int i;
-     for (i=0 ; i < 8 ; i++)
-     {
-         bina[7-i]=(n % 2)+'0';
-         n = (n - (n % 2) ) /2;
-     }
-}
-
+using namespace std;
 
 int main(int argc, char *argv[]){
     // considero gli argomenti passati da linea di comando
@@ -51,9 +22,9 @@ int main(int argc, char *argv[]){
     short headerColor;
     int headerOffset, headerLarg, headerAlt, headerDimIMG;
     
-    char* nomeFileIn = "kimi512.bmp";
+    char* nomeFileIn = "img/kimi512.bmp";
     //char* nomeFileIn = "kimi512.bmp";
-	char* nomeFileOut = "output.bmp";
+	char* nomeFileOut = "img/output.bmp";
     Header* mioHeader = new Header(nomeFileIn);
 	mioHeader->stampaInfoHeader();
 	
@@ -71,6 +42,7 @@ int main(int argc, char *argv[]){
 	else
 		LungRow = LungRowData;
 	
+	cout << "LungRow: " << LungRow << " LungRowData: " << LungRowData <<" \t larghezza in px: "<< headerLarg <<endl;
 	// TODO: attenzione, LungRow e LungRowData rappresentano byte, definiti così vanno bene se sono nel caso RGB (perché ho 1 o 3 byte per pixel)
 	
 	FILE *puntFile;
@@ -98,77 +70,29 @@ int main(int argc, char *argv[]){
 		//cout <<"\n";
 	}
 	fclose(puntFile);
-    
-    // applicazione di qualche filtro by Umberto
-    
-  ImageFilter* img=new ImageFilter(bitMap,headerAlt,headerLarg);
-  unsigned char* bm=img->contrasto(1);
-  bm=bitMap;
-	
-    /*
-    
-	// eventuali modifiche nello header
-    
-    // scrittura dello header e della bitMap
-	mioHeader->scriviHeader(nomeFileOut);			// scrittura header (anche la Palette)
-	
 
-	puntFile = fopen(nomeFileOut, "wb");
-	if(puntFile == NULL) {
-		cout << "Errore nell'apertura del file " << nomeFileIn << " !\n";
-		exit(1);
-		}
-	cout << "LungRow: " << LungRow << " LungRowData: " << LungRowData <<" \t larghezza in px: "<< headerLarg <<endl;
-	fseek(puntFile, headerOffset, 0);
-	
-	// per ogni riga devo aggiungere alla fine degli zeri
-	for(int i=0; i<headerAlt; i++){						// scorro tutte le righe
-		unsigned char riga[LungRow];				// inizializzo a zero
-		for(int j=0; j<LungRowData; j++)				// assegno i valori della bitMap ai primi byte (i rimanenti saranno a zero)
-			riga[j] = bitMap[i*LungRowData+j];
-		fwrite(riga, LungRow, 1, puntFile);				// scrivo la riga nel file
-	}
-	
-	fclose(puntFile);
-	
-	*/
-	
     
-    
-    
-	    
     // applicazione di qualche filtro by Umberto
 	// eventuali modifiche nello header
     
     // scrittura dello header e della bitMap
-	mioHeader->scriviHeader(nomeFileOut);			// scrittura header (anche la Palette)
+	mioHeader->scriviHeader(nomeFileOut);			// scrittura header (anche la Palette se c'è)
 	
-	 ofstream fileout;
-		  fileout.open("output.bmp",  ios_base::app| ios::binary);
-		  
-
-		
-	cout << "LungRow: " << LungRow << " LungRowData: " << LungRowData <<" \t larghezza in px: "<< headerLarg <<endl;
+	// scrittura della bitMap
+	ofstream fileout;
+	fileout.open(nomeFileOut, ios_base::app| ios::binary);
 
 	
 	// per ogni riga devo aggiungere alla fine degli zeri
 	for(int i=0; i<headerAlt; i++){						// scorro tutte le righe
-		unsigned char riga[LungRow];				// inizializzo a zero
+		unsigned char riga[LungRow];					// inizializzo a zero la riga della dimensione necessaria
 		for(int j=0; j<LungRowData; j++)				// assegno i valori della bitMap ai primi byte (i rimanenti saranno a zero)
 			riga[j] = bitMap[i*LungRowData+j];
-		streamsize out=LungRow;
-		fileout.write((const char*)riga,out);
-		//fwrite(riga, LungRow, 1, puntFile);	
-		// scrivo la riga nel file
+		streamsize dimensioneOut = LungRow;
+		fileout.write((const char*)riga, dimensioneOut);			// scrivo la riga nel file
 	
-		
 	}
-	  fileout.close();
+	fileout.close();
 	
-	
-	
-    
-    // leggo Header e creo la corrispondente classe di immagine (ImageRGB o ImageMono)
-	// prendo l'offset dell'immagine e leggo la bitmap
 	cout << " -----   FINE  PROGRAMMA  ----- \n";
-    }
+}

@@ -30,12 +30,7 @@ public:
         
 		fseek(puntFile, 0, 0);
 		fread(headerContent, DIM_HEADER_INIZIALE, 1, puntFile);		// leggo l'intero header e lo metto in headerContent
-		cout << "Header letto: \n";
-		
-		
-		for (int i=0; i<DIM_HEADER_INIZIALE; i++)
-			cout << i<<") "<< headerContent[i]<<endl;
-		
+
 		fseek(puntFile, 0, 0);
 		fread(firma,2, 1, puntFile);
 	
@@ -96,7 +91,6 @@ public:
 			else
 				cout << "Attenzione: dimensione Palette diversa da "<<DIM_PALETTE<<endl;
 		}
-		
 		
 		fclose(puntFile);											// chiusura del file
 	}
@@ -159,52 +153,21 @@ public:
 	
 	void scriviHeader(char* nomeFile){	
 	// scrive l'Header nel nuovo file, a partire da quello che aveva letto inizialmente, riscrive sempre le dimensioni e l'offset immagine
-	/*	FILE *puntFile;
-        puntFile = fopen(nomeFile,"wb");			// apre il file in modalità wb, se non esiste lo crea
-		if(puntFile == NULL) {
-			cout << "Errore nell'apertura del file " << nomeFile << " !\n";
-			exit(1);
-			}
-		fseek(puntFile, 0, 0);
-		cout<<"AAAAAAAAAAAAAAAAAAAAAAA     "<<headerContent[0]<<endl;
-		char b[1]={'Z'};
+	
+	// TODO: sistemare la riscrittura di eventuali dimensioni cambiate o simili
+		ofstream fileout;
+		fileout.open(nomeFile, ios::out | ios::binary);
 		
-		
-		
-		fwrite(b, 1, 1, puntFile);			// scrive nel file tutto lo Header
-		//if (esistePalette)*/
-	//		fwrite(paletteContent, DIM_PALETTE, 1, puntFile);					// scrive nel file la Palette
-		
-		// qua devo riscrivere le informazioni che potrebbero essere cambiate, ad es. le dimensioni
-		
-		
-		 ofstream fileout;
-		  fileout.open("output.bmp", ios::out | ios::binary);
+		streamsize dimensioneOut = header_size+14;
+		fileout.write((const char*)headerContent, dimensioneOut);
 		  
-		streamsize out=header_size+14;
-		  
-		  fileout.write((const char*)headerContent,out);
-		  
-		    fileout.close();
-		  
-		  if (esistePalette){
-			fileout.open("output.bmp",  ios_base::app| ios::binary);
-			out=DIM_PALETTE;
-			fileout.write((const char*)paletteContent,out);
-			fileout.close();
+		if (esistePalette){
+			dimensioneOut = DIM_PALETTE;
+			fileout.write((const char*)paletteContent, dimensioneOut);
 		  }
-		      
-		  fileout.close();
-		  
-		
-	//	fclose(puntFile);
-	//	
-
-
+		fileout.close();
 	}
 };
-
-
 
 
 //TODO: fare classe Header con lettura/scrittura su file
