@@ -134,9 +134,24 @@
     return bitMap;
     
   }
+   
+  unsigned char ImageFilter::returnPixel(unsigned char* bit,int i,int j){
+    return bit[i*this->lunghezza*3+j];
+  }
+  
+  int getKernelPosition(int x){
+    if(x==-1)
+      return 0;
+    else
+      if(x==0)
+	return 1;
+      else
+	return 2;
+
+  }
   
   
-  int ImageFilter::apply3x3Convolution(double kernel[3][3], int i, int j){
+  int ImageFilter::apply3x3Convolution(unsigned char* copia,float kernel[3][3], int i, int j,int sum){
     
    int a=-1,b=-1,c=1,d=1;
    
@@ -150,51 +165,63 @@
   if(i==0)
     a=0;
    //Controllo se mi trovo all'inizio di una riga
-  if(j==0)
+  if(j==0||j==1||j==2)
     b=0;
   //Controllo se mi trovo sull'ultima riga in alto
   if(i==this->altezza-1)
     c=0;
   //Controllo se sono alla fine di una riga
-  if(j==this->lunghezza-1)
+  if(j==this->lunghezza*3-1||j==this->lunghezza*3-2||j==this->lunghezza*3-3)
     d=0;
   
-  int ris=0,val=0;
+  float val, ris=0;
   
-  for(a;a<c;a++){
-   for(b;b<d;b++){
-     val=bitMap[((i+a)*this->lunghezza)+(j+b)];
-     ris += val*kernel[a][b];
+  
+  for(a;a<=c;a++){
+   for(int z=b;z<=d;z++){   
+     val=returnPixel(copia,i+a,j+(z*3));
+     ris += val*kernel[getKernelPosition(a)][getKernelPosition(z)];
    }    
   }
-  
-  return ris;
+  ris/=sum;
+  if(ris < 0) 
+    ris = 0;
+  if(ris > 255) 
+    ris = 255;
+
+  return (unsigned char)ris;
     
     
   }
+ 
  
  
  
  unsigned char* ImageFilter::blur(){
 
-   double kernel[3][3] ={
+   float kernel[3][3] ={
      {1,1,1},
      {1,1,1},
      {1,1,1}
- };
+   };    
+ 
+ int div=9;
+
+ 
+ unsigned char copia[this->altezza*this->lunghezza*3];
+ 
+ for(int i=0; i<arr_size;i++)
+   copia[i]=bitMap[i];
  
     for(int i = 0;i < this->altezza;i++) {
-	for(int j = 0;j < this->lunghezza;j++) {
-	  bitMap[i*this->lunghezza+j] = apply3x3Convolution(kernel,i,j);
+	for(int j = 0;j < this->lunghezza*3;j++) {
+	  bitMap[i*this->lunghezza*3+j] =apply3x3Convolution(copia,kernel,i,j,div);
 	}
     }
     
     return bitMap;
    
  }
- 
- 
- 
  
  
  

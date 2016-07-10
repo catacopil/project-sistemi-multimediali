@@ -7,7 +7,8 @@ private:
    unsigned char* bitMap;
    int altezza,lunghezza;
    
-   int apply3x3Convolution(double kernel[3][3],int,int);
+   int apply3x3Convolution(unsigned char*,float kernel[3][3],int,int,int);
+   unsigned char returnPixel(unsigned char*,int,int);
    
    
 public:
