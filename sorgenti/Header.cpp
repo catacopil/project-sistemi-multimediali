@@ -154,13 +154,26 @@ public:
 	void scriviHeader(char* nomeFile){	
 	// scrive l'Header nel nuovo file, a partire da quello che aveva letto inizialmente, riscrive sempre le dimensioni e l'offset immagine
 	
-	// TODO: sistemare la riscrittura di eventuali dimensioni cambiate o simili
 		ofstream fileout;
 		fileout.open(nomeFile, ios::out | ios::binary);
+		long positionIniziale = fileout.tellp();
 		
 		streamsize dimensioneOut = header_size+14;
 		fileout.write((const char*)headerContent, dimensioneOut);
-		  
+		
+		// riscrive i campi dimensione_totale, offset, larghezza e altezza
+		fileout.seekp(positionIniziale+2);
+		fileout.write(reinterpret_cast<const char *>(&dimensione_totale), sizeof(dimensione_totale));
+		
+		fileout.seekp(positionIniziale+10);
+		fileout.write(reinterpret_cast<const char *>(&offset), sizeof(offset));
+
+		fileout.seekp(positionIniziale+18);
+		fileout.write(reinterpret_cast<const char *>(&larghezza), sizeof(larghezza));
+
+		fileout.seekp(positionIniziale+22);
+		fileout.write(reinterpret_cast<const char *>(&altezza), sizeof(altezza));		
+		
 		if (esistePalette){
 			dimensioneOut = DIM_PALETTE;
 			fileout.write((const char*)paletteContent, dimensioneOut);
@@ -168,7 +181,3 @@ public:
 		fileout.close();
 	}
 };
-
-
-//TODO: fare classe Header con lettura/scrittura su file
-//TODO: vedere il resize e applicarlo sul codice

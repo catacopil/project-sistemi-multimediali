@@ -27,10 +27,16 @@ int main(int argc, char *argv[]){
     //char* nomeFileIn = "kimi512.bmp";
 	char* nomeFileOut = "img/output.bmp";
     Header* mioHeader = new Header(nomeFileIn);
+	headerLarg = mioHeader->getLarghezza();
+	headerAlt = mioHeader->getAltezza();
 	mioHeader->stampaInfoHeader();
 	
 	// creo la bitMap che viene letta direttamente dal file indicato
 	BitMapRGB* mioBitMap = new BitMapRGB(nomeFileIn, mioHeader->getOffsetIMG(), mioHeader->getLarghezza(), mioHeader->getAltezza());
+	
+	//mioHeader->setLarghezza(headerLarg/2);				// DIMEZZO LE DIMENSIONI
+	//mioHeader->setAltezza(headerAlt/2);
+	
 	
 	mioHeader->scriviHeader(nomeFileOut);			// scrittura header (anche la Palette se c'è)
 	

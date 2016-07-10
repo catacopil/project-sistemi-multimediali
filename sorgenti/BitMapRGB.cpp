@@ -41,22 +41,24 @@ public:
 		int l=fread(rigaBitMap, sizeof(unsigned char), LungRow, puntFile);
 		for(int i=0; i<LungRowData; i++)			// copio i dati che mi interessano nella bitMap
 			bitMap[i] = rigaBitMap[i];
-			
+		
 		int riga=0;
-		while (l == LungRow){
+		while ((l == LungRow)&&(riga<altezza)){ 	// controllo anche che non vada oltre l'altezza, altrimenti rischia di crashare perché scrive fuori dalla bitMap!
 			riga++;
 			l=fread(rigaBitMap, sizeof(unsigned char), LungRow, puntFile);		// leggo la riga di dati dal file
 			for(int i=0; i<LungRowData; i++){									// copio in bitMap i dati sui pixel
 				bitMap[LungRowData*riga+i] = rigaBitMap[i];
-				//cout << " "<< bitMap[LungRowData*riga+i];
 			}
-			//cout <<"\n";
 		}
 		fclose(puntFile);
 	}
 	
 	unsigned char* getBitMap(){
 			return bitMap;
+	}
+	
+	void setBitMap(unsigned char* newBitMap){
+		bitMap = newBitMap;
 	}
 	
 	void scriviBitMap(char* nomeFileOut){
