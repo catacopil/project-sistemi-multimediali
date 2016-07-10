@@ -58,6 +58,7 @@ public:
 	}
 	
 	void setBitMap(unsigned char* newBitMap){
+		delete[] bitMap;
 		bitMap = newBitMap;
 	}
 	
@@ -83,5 +84,45 @@ public:
 		fileout.close();
 	}
 	
+	void ridimensiona(int newLarg, int newAlt){				// RIDIMENSIONA L'IMMAGINE CON I NUOVI PIXEL
+		if (larghezza==newLarg && altezza==newAlt)
+			return;
+		unsigned char* newBitMap = new unsigned char[newLarg*newAlt*3];
+		double scaleWidth =  (double)newLarg / (double)larghezza;
+        double scaleHeight = (double)newAlt / (double)altezza;
+		int x2, y2;
+		for (int i=0;i<newAlt;i++) {
+				for (int j=0;j<newLarg;j++) {
+					int pixel = (i * (newLarg *3)) + (j*3);
+					int nearestMatch =  (((int)(i / scaleHeight) * (altezza *3)) + ((int)(j / scaleWidth) *3) );
+					newBitMap[pixel    ] =  bitMap[nearestMatch    ];
+					newBitMap[pixel + 1] =  bitMap[nearestMatch + 1];
+					newBitMap[pixel + 2] =  bitMap[nearestMatch + 2];
+				}                
+			}
+		larghezza = newLarg;
+		altezza = newAlt;
+		delete[] bitMap;
+		bitMap = newBitMap;
+		
+	/*	public int[] resizePixels(int[] pixels,int w1,int h1,int w2,int h2) {
+			int[] temp = new int[w2*h2] ;
+			// EDIT: added +1 to account for an early rounding problem
+			int x_ratio = (int)((w1<<16)/w2) +1;
+			int y_ratio = (int)((h1<<16)/h2) +1;
+			//int x_ratio = (int)((w1<<16)/w2) ;
+			//int y_ratio = (int)((h1<<16)/h2) ;
+			int x2, y2 ;
+			for (int i=0;i<h2;i++) {
+				for (int j=0;j<w2;j++) {
+					x2 = ((j*x_ratio)>>16) ;
+					y2 = ((i*y_ratio)>>16) ;
+					temp[(i*w2)+j] = pixels[(y2*w1)+x2] ;
+				}                
+			}                
+			return temp ;
+		}	*/
 
+		
+	}
 };
