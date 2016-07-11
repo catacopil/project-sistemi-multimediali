@@ -133,6 +133,10 @@ public:
 		dimensione_totale = newDim;
 	}
 	
+	void setColor(int newColor){
+		color = newColor;
+	}
+	
 	void stampaInfoHeader(){					// stampa nella console le informazioni dell'header
 		cout<<"---------  Informazioni Header   --------\n";
 		cout<<"Firma: "<<firma[0]<<firma[1]<<endl;
@@ -163,7 +167,7 @@ public:
 		streamsize dimensioneOut = header_size+14;
 		fileout.write((const char*)headerContent, dimensioneOut);
 		
-		// riscrive i campi dimensione_totale, offset, larghezza e altezza
+		// riscrive i campi dimensione_totale, offset, larghezza e altezza nelle giuste posizioni
 		fileout.seekp(positionIniziale+2);
 		fileout.write(reinterpret_cast<const char *>(&dimensione_totale), sizeof(dimensione_totale));
 		
@@ -174,7 +178,10 @@ public:
 		fileout.write(reinterpret_cast<const char *>(&larghezza), sizeof(larghezza));
 
 		fileout.seekp(positionIniziale+22);
-		fileout.write(reinterpret_cast<const char *>(&altezza), sizeof(altezza));		
+		fileout.write(reinterpret_cast<const char *>(&altezza), sizeof(altezza));
+		
+		fileout.seekp(positionIniziale+28);
+		fileout.write(reinterpret_cast<const char *>(&color), sizeof(color));
 		
 		if (esistePalette){
 			dimensioneOut = DIM_PALETTE;
