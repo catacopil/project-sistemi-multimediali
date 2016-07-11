@@ -21,7 +21,12 @@ public:
   unsigned char* solarise(double);
   
   unsigned char* blur();
-  
+  unsigned char* gaussianBlur();
+  unsigned char* boxBlur();
+  unsigned char* sharpen();
+  unsigned char* unsharpen();
+  unsigned char* edgeDetect();
+  unsigned char* sobelHorizontal();
+  unsigned char* sobelVertical();
 
-  
 };

@@ -58,7 +58,6 @@ public:
 	}
 	
 	void setBitMap(unsigned char* newBitMap){
-		delete[] bitMap;
 		bitMap = newBitMap;
 	}
 	

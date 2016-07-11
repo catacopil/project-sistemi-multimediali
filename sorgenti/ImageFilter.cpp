@@ -2,6 +2,7 @@
 #include <stdlib.h>
 #include <math.h>
 #include <iostream>
+#include <iterator>
 #include "ImageFilter.h"
 
 
@@ -19,6 +20,8 @@
     double fattore=(259*(valore+255))/(255*(259-valore));
     double pixel;
     
+    
+
     for(int i=0; i<this->altezza*this->lunghezza*3;i++){
     
       pixel=(int)bitMap[i];
@@ -134,9 +137,27 @@
     return bitMap;
     
   }
-   
+  
+  
   unsigned char ImageFilter::returnPixel(unsigned char* bit,int i,int j){
-    return bit[i*this->lunghezza*3+j];
+    
+    if(i>=0 && i<= this->altezza && j>=0 && j<= this->lunghezza*3)
+      return bit[i*this->lunghezza*3+j];
+    if(i<0 && j<0)
+      return bit[0];
+    if(i<0)
+      return bit[j];
+    if(j<0)
+      return bit[i*this->lunghezza*3];
+    if(j>this->lunghezza*3)
+      return bit[i*this->lunghezza*3+this->lunghezza*3];
+    if(i>this->altezza && j<0)
+      return bit[i*this->lunghezza*3];
+    if(i>this->altezza)
+      return bit[i*this->lunghezza*3+j];
+    
+    
+
   }
   
   int getKernelPosition(int x){
@@ -161,21 +182,7 @@
     * Si noti che un BMP inizia da basso a sinistra e finisce in alto a destra
     */
    
-   //Controllo se sono sulla riga in basso a sinistra
-  if(i==0)
-    a=0;
-   //Controllo se mi trovo all'inizio di una riga
-  if(j==0||j==1||j==2)
-    b=0;
-  //Controllo se mi trovo sull'ultima riga in alto
-  if(i==this->altezza-1)
-    c=0;
-  //Controllo se sono alla fine di una riga
-  if(j==this->lunghezza*3-1||j==this->lunghezza*3-2||j==this->lunghezza*3-3)
-    d=0;
-  
   float val, ris=0;
-  
   
   for(a;a<=c;a++){
    for(int z=b;z<=d;z++){   
@@ -207,15 +214,85 @@
  
  int div=9;
 
- 
+ int arr_size = this->altezza*this->lunghezza*3;
  unsigned char copia[this->altezza*this->lunghezza*3];
  
- int arr_size = this->altezza*this->lunghezza*3;
  for(int i=0; i<arr_size;i++)
    copia[i]=bitMap[i];
  
-    for(int i = 0;i < this->altezza;i++) {
-	for(int j = 0;j < this->lunghezza*3;j++) {
+ 
+    for(int i = 1;i < this->altezza-1;i++) {
+	for(int j = 1;j < this->lunghezza*3-1;j++) {
+	  bitMap[i*this->lunghezza*3+j] =apply3x3Convolution(copia,kernel,i,j,div);
+	}
+    }
+    
+    return bitMap;
+   
+ }
+ 
+
+ 
+  unsigned char* ImageFilter::gaussianBlur(){
+
+ float kernel[3][3] ={{0.045, 0.122, 0.045},{ 0.122, 
+  0.332, 0.122},{ 0.045, 0.122, 0.045}};
+ 
+ int div=1;
+ 
+ int arr_size = this->altezza*this->lunghezza*3;
+ unsigned char copia[this->altezza*this->lunghezza*3];
+ 
+ for(int i=0; i<arr_size;i++)
+   copia[i]=bitMap[i];
+ 
+    for(int i = 1;i < this->altezza-1;i++) {
+	for(int j = 1;j < this->lunghezza*3-1;j++) {
+	  bitMap[i*this->lunghezza*3+j] =apply3x3Convolution(copia,kernel,i,j,div);
+	}
+    }
+    
+    return bitMap;
+   
+ }
+ 
+
+
+  
+  unsigned char* ImageFilter::sharpen(){
+
+ float kernel[3][3] ={{-1, -1, -1},{ -1, 16, -1},{ -1, -1, -1}};
+ int div=8;
+ 
+ int arr_size = this->altezza*this->lunghezza*3;
+ unsigned char copia[this->altezza*this->lunghezza*3];
+ 
+ for(int i=0; i<arr_size;i++)
+   copia[i]=bitMap[i];
+ 
+    for(int i = 1;i < this->altezza-1;i++) {
+	for(int j = 1;j < this->lunghezza*3-1;j++) {
+	  bitMap[i*this->lunghezza*3+j] =apply3x3Convolution(copia,kernel,i,j,div);
+	}
+    }
+    
+    return bitMap;
+   
+ }
+
+  unsigned char* ImageFilter::unsharpen(){
+
+ float kernel[3][3] ={{-1, -1, -1},{ -1, 9, -1},{ -1, -1, -1}};
+ int div=1;
+ 
+ int arr_size = this->altezza*this->lunghezza*3;
+ unsigned char copia[this->altezza*this->lunghezza*3];
+ 
+ for(int i=0; i<arr_size;i++)
+   copia[i]=bitMap[i];
+ 
+    for(int i = 1;i < this->altezza-1;i++) {
+	for(int j = 1;j < this->lunghezza*3-1;j++) {
 	  bitMap[i*this->lunghezza*3+j] =apply3x3Convolution(copia,kernel,i,j,div);
 	}
     }
@@ -225,11 +302,96 @@
  }
  
  
+  unsigned char* ImageFilter::edgeDetect(){
+
+ float kernel[3][3] ={{-0.125, -0.125, -0.125},{ -0.125, 
+  1, -0.125},{ -0.125, -0.125, -0.125}};
+ int div=1;
+ 
+ int arr_size = this->altezza*this->lunghezza*3;
+ unsigned char copia[this->altezza*this->lunghezza*3];
+ 
+ for(int i=0; i<arr_size;i++)
+   copia[i]=bitMap[i];
+ 
+    for(int i = 1;i < this->altezza-1;i++) {
+	for(int j = 1;j < this->lunghezza*3-1;j++) {
+	  bitMap[i*this->lunghezza*3+j] =apply3x3Convolution(copia,kernel,i,j,div);
+	}
+    }
+    
+    return bitMap;
+   
+ }
+
+  
+  unsigned char* ImageFilter::boxBlur(){
+
+ float kernel[3][3] ={{0.111, 0.111, 0.111},{ 0.111, 
+  0.111, 0.111},{ 0.111, 0.111, 0.111}};
+ int div=1;
+ 
+ int arr_size = this->altezza*this->lunghezza*3;
+ unsigned char copia[this->altezza*this->lunghezza*3];
+ 
+ for(int i=0; i<arr_size;i++)
+   copia[i]=bitMap[i];
+ 
+    for(int i = 1;i < this->altezza-1;i++) {
+	for(int j = 1;j < this->lunghezza*3-1;j++) {
+	  bitMap[i*this->lunghezza*3+j] =apply3x3Convolution(copia,kernel,i,j,div);
+	}
+    }
+    
+    return bitMap;
+   
+ }  
  
  
 
+  unsigned char* ImageFilter::sobelHorizontal(){
+
+ float kernel[3][3] ={{1, 2, 1},{ 0, 0, 0}, {-1, -2, -1 }};
+ int div=1;
+ 
+ int arr_size = this->altezza*this->lunghezza*3;
+ unsigned char copia[this->altezza*this->lunghezza*3];
+ 
+ for(int i=0; i<arr_size;i++)
+   copia[i]=bitMap[i];
+ 
+    for(int i = 1;i < this->altezza-1;i++) {
+	for(int j = 1;j < this->lunghezza*3-1;j++) {
+	  bitMap[i*this->lunghezza*3+j] =apply3x3Convolution(copia,kernel,i,j,div);
+	}
+    }
+    
+    return bitMap;
+   
+ }  
+ 
+  unsigned char* ImageFilter::sobelVertical(){
+
+ float kernel[3][3] ={{1, 0, -1},{ 2, 0, -2},{ 1, 0, -1 }};
+ int div=1;
+ 
+ int arr_size = this->altezza*this->lunghezza*3;
+ unsigned char copia[this->altezza*this->lunghezza*3];
+ 
+ for(int i=0; i<arr_size;i++)
+   copia[i]=bitMap[i];
+ 
+    for(int i = 1;i < this->altezza-1;i++) {
+	for(int j = 1;j < this->lunghezza*3-1;j++) {
+	  bitMap[i*this->lunghezza*3+j] =apply3x3Convolution(copia,kernel,i,j,div);
+	}
+    }
+    
+    return bitMap;
+   
+ }  
   
-  
+
   
   
   
