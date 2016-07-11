@@ -210,6 +210,7 @@
  
  unsigned char copia[this->altezza*this->lunghezza*3];
  
+ int arr_size = this->altezza*this->lunghezza*3;
  for(int i=0; i<arr_size;i++)
    copia[i]=bitMap[i];
  

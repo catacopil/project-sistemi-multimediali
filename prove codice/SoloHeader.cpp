@@ -21,7 +21,12 @@ int main(int argc, char *argv[]){
     
     FILE *puntFile;
         puntFile = fopen(nomeFile,"rb");
-        
+    if(puntFile == NULL) {
+			cout << "Errore nell'apertura del file " << nomeFile << " !\n";
+			exit(1);
+			}
+	cout << "Leggo Header del file '"<< nomeFile <<"'"<< endl;
+	
 	fseek(puntFile, 0, 0);
 	fread(firma,2, 1, puntFile);
 	

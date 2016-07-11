@@ -35,12 +35,13 @@ int main(int argc, char *argv[]){
 	BitMapRGB* mioBitMap = new BitMapRGB(nomeFileIn, mioHeader->getOffsetIMG(), mioHeader->getLarghezza(), mioHeader->getAltezza());
 	
 	// MODIFICO LE DIMENSIONI
-	nuovaLarg = 1024; nuovaAlt=1024;
-	// TODO: da ricalcolare la dimensione_totale dell'immagine
+	nuovaLarg = 1024; nuovaAlt = 1024;
 	mioHeader->setLarghezza(nuovaLarg);
 	mioHeader->setAltezza(nuovaAlt);
 	mioBitMap->ridimensiona(nuovaLarg,nuovaAlt);
 	
+	cout << " ------  OUTPUT Header  ------ \n";
+	mioHeader->stampaInfoHeader();
 	
 	mioHeader->scriviHeader(nomeFileOut);			// scrittura header (anche la Palette se c'è)
 	mioBitMap->scriviBitMap(nomeFileOut);			// stampo nel file di destinazione la bitMap

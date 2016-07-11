@@ -15,7 +15,7 @@ private:
 	char firma[2],piani[2];
     short color;
     int dimensione_totale, riservato, offset, header_size, larghezza, altezza, compressione, dimensione_immagine;
-    int ris_orizzontale,ris_verticale,pallete1,pallete2,l;
+    int ris_orizzontale,ris_verticale,pallete1,pallete2;
 	bool esistePalette;
     
 public:
@@ -117,10 +117,12 @@ public:
 	
 	void setLarghezza(int newLarg){
 		larghezza = newLarg;
+		dimensione_totale = larghezza*altezza*color/8;				// aggiorno anche la dimensione_totale dell'immagine
 	}
 	
 	void setAltezza(int newAlt){
 		altezza = newAlt;
+		dimensione_totale = larghezza*altezza*color/8;				// aggiorno anche la dimensione_totale dell'immagine
 	}
 
 	void setOffset(int newOffset){
@@ -132,7 +134,7 @@ public:
 	}
 	
 	void stampaInfoHeader(){					// stampa nella console le informazioni dell'header
-		cout<<"------  Informazioni Header letto  ------\n";
+		cout<<"---------  Informazioni Header   --------\n";
 		cout<<"Firma: "<<firma[0]<<firma[1]<<endl;
 		cout<<"Dimensione totale: "<<dimensione_totale<<endl;
 		cout<<"Reserved: "<<riservato<<endl;
