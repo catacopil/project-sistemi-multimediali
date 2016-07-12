@@ -13,12 +13,13 @@ class BitMapRGB{
 private:
 	unsigned char* bitMap;
 	int offsetIMG, larghezza, altezza;
-	int color = 24;			// 24 bit per ogni pixel
+	int color;			// 24 bit per ogni pixel
 public:
-	BitMapRGB(char* nomeFileIn, int offset, int larg, int alt){
+	BitMapRGB(char* nomeFileIn, int offset, int larg, int alt,int col){
 		offsetIMG = offset;
 		larghezza = larg;
 		altezza = alt;
+		color=col;
 		int LungRow;
 		int LungRowData = (larghezza*color)/8;												// Byte per riga, con solo i pixel (senza zeri)
 		if (LungRowData%4 !=0)

@@ -7,10 +7,12 @@
 
 
 
-  ImageFilter::ImageFilter(unsigned char* bitMap,int altezza,int lunghezza){
+
+  ImageFilter::ImageFilter(unsigned char* bitMap,int altezza,int lunghezza, int color){
     this->bitMap=bitMap;
     this->altezza=altezza;
     this->lunghezza=lunghezza;
+    this->bitColor=color;
   }
   
   
@@ -19,11 +21,14 @@
     
     double fattore=(259*(valore+255))/(255*(259-valore));
     double pixel;
+    int size;
     
-    
-
-    for(int i=0; i<this->altezza*this->lunghezza*3;i++){
-    
+    if(this->bitColor==8)
+      size=this->altezza*this->lunghezza;
+    else
+      size=this->altezza*this->lunghezza*3;
+ 
+    for(int i=0; i<size;i++){
       pixel=(int)bitMap[i];
       
       pixel=(fattore*(pixel-128)+128);
@@ -44,9 +49,14 @@
   unsigned char* ImageFilter::luminosita(double valore){
     
     double pixel;
+    int size;
     
+    if(this->bitColor==8)
+      size=this->altezza*this->lunghezza;
+    else
+      size=this->altezza*this->lunghezza*3;
  
-    for(int i=0; i<this->altezza*this->lunghezza*3;i++){
+    for(int i=0; i<size;i++){
     
       pixel=(int)bitMap[i];
       pixel+=(valore*pixel)/255.0;
@@ -71,7 +81,15 @@
     
     if(valore!=0){
       double gamma=1/valore;
-      for(int i=0; i<this->altezza*this->lunghezza*3;i++){
+      
+    int size;
+    
+    if(this->bitColor==8)
+      size=this->altezza*this->lunghezza;
+    else
+      size=this->altezza*this->lunghezza*3;
+ 
+    for(int i=0; i<size;i++){
 	pixel=(double)bitMap[i];;
 	pixel=pow(pixel/255.0, gamma);
 	pixel*=255.0;
@@ -97,9 +115,14 @@
   unsigned char* ImageFilter::coloreInverso(){
     
     int pixel;
+    int size;
     
-    for(int i=0; i<this->altezza*this->lunghezza*3;i++){
-    
+    if(this->bitColor==8)
+      size=this->altezza*this->lunghezza;
+    else
+      size=this->altezza*this->lunghezza*3;
+ 
+    for(int i=0; i<size;i++){
       pixel=(int)bitMap[i];
       pixel=255-pixel;
       if(pixel>255)
@@ -118,8 +141,14 @@
   unsigned char* ImageFilter::solarise(double soglia){
     
     int pixel;
+    int size;
     
-    for(int i=0; i<this->altezza*this->lunghezza*3;i++){
+    if(this->bitColor==8)
+      size=this->altezza*this->lunghezza;
+    else
+      size=this->altezza*this->lunghezza*3;
+ 
+    for(int i=0; i<size;i++){
     
       pixel=(int)bitMap[i];
       if(pixel<=soglia)
@@ -139,7 +168,38 @@
   }
   
   
-  unsigned char ImageFilter::returnPixel(unsigned char* bit,int i,int j){
+  unsigned char* ImageFilter::scalaDiGrigi(){
+    
+    double pixel;
+    int size=size=this->altezza*this->lunghezza*3;
+    int r,g,b;
+    
+    if(this->bitColor!=8){
+    for(int i=0; i<size;i=i+3){
+    
+      b=(int)bitMap[i];
+      g=(int)bitMap[i+1];
+      r=(int)bitMap[i+2];
+      //pixel=0.299*r+0.587*g+0.114*b;
+     // pixel=255-pixel;
+      pixel=(r+g+b)/3;
+      
+      if(pixel>255)
+	pixel=255;
+      if(pixel<0)
+	pixel=0;
+      
+      bitMap[i/3]=(unsigned char)pixel;
+      }
+    }
+    else
+      cout<<"Errore! L'immagine e' già in scala di Grigi."<<endl;
+    
+    return bitMap;
+    
+  }  
+  
+  unsigned char ImageFilter::returnRGBPixel(unsigned char* bit,int i,int j){
     
     if(i>=0 && i<= this->altezza && j>=0 && j<= this->lunghezza*3)
       return bit[i*this->lunghezza*3+j];
@@ -155,9 +215,25 @@
       return bit[i*this->lunghezza*3];
     if(i>this->altezza)
       return bit[i*this->lunghezza*3+j];
-    
-    
 
+  }
+  
+    unsigned char ImageFilter::returnMonoPixel(unsigned char* bit,int i,int j){
+    
+    if(i>=0 && i<= this->altezza && j>=0 && j<= this->lunghezza)
+      return bit[i*this->lunghezza+j];
+    if(i<0 && j<0)
+      return bit[0];
+    if(i<0)
+      return bit[j];
+    if(j<0)
+      return bit[i*this->lunghezza];
+    if(j>this->lunghezza)
+      return bit[i*this->lunghezza+this->lunghezza];
+    if(i>this->altezza && j<0)
+      return bit[i*this->lunghezza];
+    if(i>this->altezza)
+      return bit[i*this->lunghezza+j];
   }
   
   int getKernelPosition(int x){
@@ -172,7 +248,7 @@
   }
   
   
-  int ImageFilter::apply3x3Convolution(unsigned char* copia,float kernel[3][3], int i, int j,int sum){
+  int ImageFilter::applyRGBConvolution(unsigned char* copia,float kernel[3][3], int i, int j,int sum){
     
    int a=-1,b=-1,c=1,d=1;
    
@@ -186,7 +262,36 @@
   
   for(a;a<=c;a++){
    for(int z=b;z<=d;z++){   
-     val=returnPixel(copia,i+a,j+(z*3));
+     val=returnRGBPixel(copia,i+a,j+(z*3));
+     ris += val*kernel[getKernelPosition(a)][getKernelPosition(z)];
+   }    
+  }
+  ris/=sum;
+  if(ris < 0) 
+    ris = 0;
+  if(ris > 255) 
+    ris = 255;
+
+  return (unsigned char)ris;
+    
+    
+  }
+  
+    int ImageFilter::applyMonoConvolution(unsigned char* copia,float kernel[3][3], int i, int j,int sum){
+    
+   int a=-1,b=-1,c=1,d=1;
+   
+   /*
+    * Inizio i check sulla posizione attuale. 
+    * Se sono sul bordo non posso applicare tutta la matrice di Convoluzione
+    * Si noti che un BMP inizia da basso a sinistra e finisce in alto a destra
+    */
+   
+  float val, ris=0;
+  
+  for(a;a<=c;a++){
+   for(int z=b;z<=d;z++){   
+     val=returnMonoPixel(copia,i+a,j+(z*3));
      ris += val*kernel[getKernelPosition(a)][getKernelPosition(z)];
    }    
   }
@@ -213,21 +318,35 @@
    };    
  
  int div=9;
-
- int arr_size = this->altezza*this->lunghezza*3;
- unsigned char copia[this->altezza*this->lunghezza*3];
+ int arr_size;
  
+ if(this->bitColor==8)
+    arr_size=this->altezza*this->lunghezza;
+ else
+    arr_size=this->altezza*this->lunghezza*3;
+
+ unsigned char copia[arr_size];
  for(int i=0; i<arr_size;i++)
    copia[i]=bitMap[i];
  
- 
+ //Caso monocolore. Utilizzo il metodo di Convoluzione monocolore: applyMonoConvolution
+ if(this->bitColor==1){
     for(int i = 1;i < this->altezza-1;i++) {
+	for(int j = 1;j < this->lunghezza-1;j++) {
+	  bitMap[i*this->lunghezza+j] =applyMonoConvolution(copia,kernel,i,j,div);
+	}
+    }   
+ }
+ //Caso RGB. Utilizzo il metodo di convoluzione RGB: applyRGBConvolution
+ else{
+       for(int i = 1;i < this->altezza-1;i++) {
 	for(int j = 1;j < this->lunghezza*3-1;j++) {
-	  bitMap[i*this->lunghezza*3+j] =apply3x3Convolution(copia,kernel,i,j,div);
+	  bitMap[i*this->lunghezza*3+j] =applyRGBConvolution(copia,kernel,i,j,div);
 	}
     }
-    
-    return bitMap;
+ }
+ 
+ return bitMap;
    
  }
  
@@ -239,20 +358,35 @@
   0.332, 0.122},{ 0.045, 0.122, 0.045}};
  
  int div=1;
+  int arr_size;
  
- int arr_size = this->altezza*this->lunghezza*3;
- unsigned char copia[this->altezza*this->lunghezza*3];
- 
+ if(this->bitColor==8)
+    arr_size=this->altezza*this->lunghezza;
+ else
+    arr_size=this->altezza*this->lunghezza*3;
+
+ unsigned char copia[arr_size];
  for(int i=0; i<arr_size;i++)
    copia[i]=bitMap[i];
  
+ //Caso monocolore. Utilizzo il metodo di Convoluzione monocolore: applyMonoConvolution
+ if(this->bitColor==1){
     for(int i = 1;i < this->altezza-1;i++) {
+	for(int j = 1;j < this->lunghezza-1;j++) {
+	  bitMap[i*this->lunghezza+j] =applyMonoConvolution(copia,kernel,i,j,div);
+	}
+    }   
+ }
+ //Caso RGB. Utilizzo il metodo di convoluzione RGB: applyRGBConvolution
+ else{
+       for(int i = 1;i < this->altezza-1;i++) {
 	for(int j = 1;j < this->lunghezza*3-1;j++) {
-	  bitMap[i*this->lunghezza*3+j] =apply3x3Convolution(copia,kernel,i,j,div);
+	  bitMap[i*this->lunghezza*3+j] =applyRGBConvolution(copia,kernel,i,j,div);
 	}
     }
-    
-    return bitMap;
+ }
+ 
+ return bitMap;
    
  }
  
@@ -263,20 +397,35 @@
 
  float kernel[3][3] ={{-1, -1, -1},{ -1, 16, -1},{ -1, -1, -1}};
  int div=8;
+ int arr_size;
  
- int arr_size = this->altezza*this->lunghezza*3;
- unsigned char copia[this->altezza*this->lunghezza*3];
- 
+ if(this->bitColor==8)
+    arr_size=this->altezza*this->lunghezza;
+ else
+    arr_size=this->altezza*this->lunghezza*3;
+
+ unsigned char copia[arr_size];
  for(int i=0; i<arr_size;i++)
    copia[i]=bitMap[i];
  
+ //Caso monocolore. Utilizzo il metodo di Convoluzione monocolore: applyMonoConvolution
+ if(this->bitColor==1){
     for(int i = 1;i < this->altezza-1;i++) {
+	for(int j = 1;j < this->lunghezza-1;j++) {
+	  bitMap[i*this->lunghezza+j] =applyMonoConvolution(copia,kernel,i,j,div);
+	}
+    }   
+ }
+ //Caso RGB. Utilizzo il metodo di convoluzione RGB: applyRGBConvolution
+ else{
+       for(int i = 1;i < this->altezza-1;i++) {
 	for(int j = 1;j < this->lunghezza*3-1;j++) {
-	  bitMap[i*this->lunghezza*3+j] =apply3x3Convolution(copia,kernel,i,j,div);
+	  bitMap[i*this->lunghezza*3+j] =applyRGBConvolution(copia,kernel,i,j,div);
 	}
     }
-    
-    return bitMap;
+ }
+ 
+ return bitMap;
    
  }
 
@@ -285,19 +434,35 @@
  float kernel[3][3] ={{-1, -1, -1},{ -1, 9, -1},{ -1, -1, -1}};
  int div=1;
  
- int arr_size = this->altezza*this->lunghezza*3;
- unsigned char copia[this->altezza*this->lunghezza*3];
+  int arr_size;
  
+ if(this->bitColor==8)
+    arr_size=this->altezza*this->lunghezza;
+ else
+    arr_size=this->altezza*this->lunghezza*3;
+
+ unsigned char copia[arr_size];
  for(int i=0; i<arr_size;i++)
    copia[i]=bitMap[i];
  
+ //Caso monocolore. Utilizzo il metodo di Convoluzione monocolore: applyMonoConvolution
+ if(this->bitColor==1){
     for(int i = 1;i < this->altezza-1;i++) {
+	for(int j = 1;j < this->lunghezza-1;j++) {
+	  bitMap[i*this->lunghezza+j] =applyMonoConvolution(copia,kernel,i,j,div);
+	}
+    }   
+ }
+ //Caso RGB. Utilizzo il metodo di convoluzione RGB: applyRGBConvolution
+ else{
+       for(int i = 1;i < this->altezza-1;i++) {
 	for(int j = 1;j < this->lunghezza*3-1;j++) {
-	  bitMap[i*this->lunghezza*3+j] =apply3x3Convolution(copia,kernel,i,j,div);
+	  bitMap[i*this->lunghezza*3+j] =applyRGBConvolution(copia,kernel,i,j,div);
 	}
     }
-    
-    return bitMap;
+ }
+ 
+ return bitMap;
    
  }
  
@@ -307,20 +472,35 @@
  float kernel[3][3] ={{-0.125, -0.125, -0.125},{ -0.125, 
   1, -0.125},{ -0.125, -0.125, -0.125}};
  int div=1;
+  int arr_size;
  
- int arr_size = this->altezza*this->lunghezza*3;
- unsigned char copia[this->altezza*this->lunghezza*3];
- 
+ if(this->bitColor==8)
+    arr_size=this->altezza*this->lunghezza;
+ else
+    arr_size=this->altezza*this->lunghezza*3;
+
+ unsigned char copia[arr_size];
  for(int i=0; i<arr_size;i++)
    copia[i]=bitMap[i];
  
+ //Caso monocolore. Utilizzo il metodo di Convoluzione monocolore: applyMonoConvolution
+ if(this->bitColor==1){
     for(int i = 1;i < this->altezza-1;i++) {
+	for(int j = 1;j < this->lunghezza-1;j++) {
+	  bitMap[i*this->lunghezza+j] =applyMonoConvolution(copia,kernel,i,j,div);
+	}
+    }   
+ }
+ //Caso RGB. Utilizzo il metodo di convoluzione RGB: applyRGBConvolution
+ else{
+       for(int i = 1;i < this->altezza-1;i++) {
 	for(int j = 1;j < this->lunghezza*3-1;j++) {
-	  bitMap[i*this->lunghezza*3+j] =apply3x3Convolution(copia,kernel,i,j,div);
+	  bitMap[i*this->lunghezza*3+j] =applyRGBConvolution(copia,kernel,i,j,div);
 	}
     }
-    
-    return bitMap;
+ }
+ 
+ return bitMap;
    
  }
 
@@ -330,20 +510,35 @@
  float kernel[3][3] ={{0.111, 0.111, 0.111},{ 0.111, 
   0.111, 0.111},{ 0.111, 0.111, 0.111}};
  int div=1;
+  int arr_size;
  
- int arr_size = this->altezza*this->lunghezza*3;
- unsigned char copia[this->altezza*this->lunghezza*3];
- 
+ if(this->bitColor==8)
+    arr_size=this->altezza*this->lunghezza;
+ else
+    arr_size=this->altezza*this->lunghezza*3;
+
+ unsigned char copia[arr_size];
  for(int i=0; i<arr_size;i++)
    copia[i]=bitMap[i];
  
+ //Caso monocolore. Utilizzo il metodo di Convoluzione monocolore: applyMonoConvolution
+ if(this->bitColor==1){
     for(int i = 1;i < this->altezza-1;i++) {
+	for(int j = 1;j < this->lunghezza-1;j++) {
+	  bitMap[i*this->lunghezza+j] =applyMonoConvolution(copia,kernel,i,j,div);
+	}
+    }   
+ }
+ //Caso RGB. Utilizzo il metodo di convoluzione RGB: applyRGBConvolution
+ else{
+       for(int i = 1;i < this->altezza-1;i++) {
 	for(int j = 1;j < this->lunghezza*3-1;j++) {
-	  bitMap[i*this->lunghezza*3+j] =apply3x3Convolution(copia,kernel,i,j,div);
+	  bitMap[i*this->lunghezza*3+j] =applyRGBConvolution(copia,kernel,i,j,div);
 	}
     }
-    
-    return bitMap;
+ }
+ 
+ return bitMap;
    
  }  
  
@@ -353,20 +548,35 @@
 
  float kernel[3][3] ={{1, 2, 1},{ 0, 0, 0}, {-1, -2, -1 }};
  int div=1;
+  int arr_size;
  
- int arr_size = this->altezza*this->lunghezza*3;
- unsigned char copia[this->altezza*this->lunghezza*3];
- 
+ if(this->bitColor==8)
+    arr_size=this->altezza*this->lunghezza;
+ else
+    arr_size=this->altezza*this->lunghezza*3;
+
+ unsigned char copia[arr_size];
  for(int i=0; i<arr_size;i++)
    copia[i]=bitMap[i];
  
+ //Caso monocolore. Utilizzo il metodo di Convoluzione monocolore: applyMonoConvolution
+ if(this->bitColor==1){
     for(int i = 1;i < this->altezza-1;i++) {
+	for(int j = 1;j < this->lunghezza-1;j++) {
+	  bitMap[i*this->lunghezza+j] =applyMonoConvolution(copia,kernel,i,j,div);
+	}
+    }   
+ }
+ //Caso RGB. Utilizzo il metodo di convoluzione RGB: applyRGBConvolution
+ else{
+       for(int i = 1;i < this->altezza-1;i++) {
 	for(int j = 1;j < this->lunghezza*3-1;j++) {
-	  bitMap[i*this->lunghezza*3+j] =apply3x3Convolution(copia,kernel,i,j,div);
+	  bitMap[i*this->lunghezza*3+j] =applyRGBConvolution(copia,kernel,i,j,div);
 	}
     }
-    
-    return bitMap;
+ }
+ 
+ return bitMap;
    
  }  
  
@@ -375,19 +585,35 @@
  float kernel[3][3] ={{1, 0, -1},{ 2, 0, -2},{ 1, 0, -1 }};
  int div=1;
  
- int arr_size = this->altezza*this->lunghezza*3;
- unsigned char copia[this->altezza*this->lunghezza*3];
+  int arr_size;
  
+ if(this->bitColor==8)
+    arr_size=this->altezza*this->lunghezza;
+ else
+    arr_size=this->altezza*this->lunghezza*3;
+
+ unsigned char copia[arr_size];
  for(int i=0; i<arr_size;i++)
    copia[i]=bitMap[i];
  
+ //Caso monocolore. Utilizzo il metodo di Convoluzione monocolore: applyMonoConvolution
+ if(this->bitColor==1){
     for(int i = 1;i < this->altezza-1;i++) {
+	for(int j = 1;j < this->lunghezza-1;j++) {
+	  bitMap[i*this->lunghezza+j] =applyMonoConvolution(copia,kernel,i,j,div);
+	}
+    }   
+ }
+ //Caso RGB. Utilizzo il metodo di convoluzione RGB: applyRGBConvolution
+ else{
+       for(int i = 1;i < this->altezza-1;i++) {
 	for(int j = 1;j < this->lunghezza*3-1;j++) {
-	  bitMap[i*this->lunghezza*3+j] =apply3x3Convolution(copia,kernel,i,j,div);
+	  bitMap[i*this->lunghezza*3+j] =applyRGBConvolution(copia,kernel,i,j,div);
 	}
     }
-    
-    return bitMap;
+ }
+ 
+ return bitMap;
    
  }  
   
