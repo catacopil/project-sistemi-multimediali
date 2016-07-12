@@ -12,15 +12,17 @@ Il costruttore di ImageFilter ha i seguenti paramentri:
 @param bitMap: contiene la bitMap dell'immagine (RGB)
 @param altezza: contiene l'altezza dell'immagine
 @param lunghezza: contiene la lunghezza dell'immagine
+@param scale: parametro opzionale di scala per il filtro
 
 Il costruttore semplicemente copia nei capi dati della classe i valori ononimi.
 
 
 **/
-  ImageFilter::ImageFilter(unsigned char* bitMap,int altezza,int lunghezza){
+  ImageFilter::ImageFilter(unsigned char* bitMap,int altezza,int lunghezza,double scale){
     this->bitMap=bitMap;
     this->altezza=altezza;
     this->lunghezza=lunghezza;
+    this->scala=scale;
   }
   
   
@@ -34,6 +36,7 @@ Il costruttore semplicemente copia nei capi dati della classe i valori ononimi.
  **/  
   unsigned char* ImageFilter::contrasto(double valore){
     
+    if(valore!=0){    
     //calcolo il fattore
     double fattore=(259*(valore+255))/(255*(259-valore));
     double pixel;
@@ -56,8 +59,15 @@ Il costruttore semplicemente copia nei capi dati della classe i valori ononimi.
       
     }
     
+    cout<<"Eseguito filtro contrasto'"<<endl;
     return bitMap;
-    
+      
+    }
+    else
+    {
+      std::cout<<"Errore! E' stato inserito un valore di scala non valido"<<std::endl;
+      return bitMap;
+    }
   }
   
  /**
@@ -70,6 +80,8 @@ Il costruttore semplicemente copia nei capi dati della classe i valori ononimi.
  **/  
   
   unsigned char* ImageFilter::luminosita(double valore){
+    
+    if(valore!=0){  
     
     double pixel;
     int size=this->altezza*this->lunghezza*3;
@@ -92,8 +104,16 @@ Il costruttore semplicemente copia nei capi dati della classe i valori ononimi.
       
     }
     
-    return bitMap;
+    cout<<"Eseguito filtro luminosita'"<<endl;    
     
+    return bitMap;
+      
+    }
+    else
+    {
+      std::cout<<"Errore! E' stato inserito un valore di scala non valido"<<std::endl;
+      return bitMap;
+    }
   }
  
  /**
@@ -108,10 +128,9 @@ Il costruttore semplicemente copia nei capi dati della classe i valori ononimi.
   
   unsigned char* ImageFilter::gamma(double valore){
     
-   double pixel;
-    
     if(valore!=0){
-      double gamma=1/valore;
+    
+    double pixel, gamma=1/valore;
       
     int size=this->altezza*this->lunghezza*3;
  
@@ -132,13 +151,15 @@ Il costruttore semplicemente copia nei capi dati della classe i valori ononimi.
       bitMap[i]=(unsigned char)pixel;
       
     }
+
+    cout<<"Eseguito filtro gamma'"<<endl;    
     
     return bitMap;
       
     }
     else
     {
-      std::cout<<"Errore! Inserire un valore diverso da 0"<<std::endl;
+      std::cout<<"Errore! E' stato inserito un valore di scala non valido"<<std::endl;
       return bitMap;
     }
   }
@@ -173,6 +194,8 @@ Il costruttore semplicemente copia nei capi dati della classe i valori ononimi.
       bitMap[i]=(unsigned char)pixel;
       
     }
+ 
+    cout<<"Eseguito filtro colore inverso'"<<endl;
     
     return bitMap;
     
@@ -190,8 +213,9 @@ Il costruttore semplicemente copia nei capi dati della classe i valori ononimi.
   
   unsigned char* ImageFilter::solarise(double soglia){
     
-    int pixel;
-    int size=this->altezza*this->lunghezza*3;
+     
+    if(soglia!=0){   
+    int pixel, size=this->altezza*this->lunghezza*3;
  
     for(int i=0; i<size;i++){
     
@@ -211,9 +235,17 @@ Il costruttore semplicemente copia nei capi dati della classe i valori ononimi.
       bitMap[i]=(unsigned char)pixel;
       }
     }
+ 
+    cout<<"Eseguito filtro solarise'"<<endl;
     
     return bitMap;
-    
+      
+    }
+    else
+    {
+      std::cout<<"Errore! E' stato inserito un valore di scala non valido"<<std::endl;
+      return bitMap;
+    }
   }
   
   /**
@@ -254,6 +286,7 @@ Il costruttore semplicemente copia nei capi dati della classe i valori ononimi.
       bitMap[i+2]=(unsigned char)pixel;
       }
 
+    cout<<"Eseguito filtro scala di grigi'"<<endl;    
     
     return bitMap;
     
@@ -392,6 +425,8 @@ Il costruttore semplicemente copia nei capi dati della classe i valori ononimi.
 	}
     }
  
+    cout<<"Eseguito filtro di convoluzione blur'"<<endl; 
+ 
  return bitMap;
    
  }
@@ -431,7 +466,8 @@ Il costruttore semplicemente copia nei capi dati della classe i valori ononimi.
 	  bitMap[i*this->lunghezza*3+j] =applyRGBConvolution(copia,kernel,i,j,div);
 	}
     }
- 
+ cout<<"Eseguito filtro di convoluzione gaussian blur'"<<endl; 
+    
  return bitMap;
    
  }
@@ -471,6 +507,7 @@ Il costruttore semplicemente copia nei capi dati della classe i valori ononimi.
 	  bitMap[i*this->lunghezza*3+j] =applyRGBConvolution(copia,kernel,i,j,div);
 	}
     }
+ cout<<"Eseguito filtro di convoluzione sharpen'"<<endl;  
  
  return bitMap;
    
@@ -509,7 +546,8 @@ Il costruttore semplicemente copia nei capi dati della classe i valori ononimi.
 	  bitMap[i*this->lunghezza*3+j] =applyRGBConvolution(copia,kernel,i,j,div);
 	}
     }
- 
+ cout<<"Eseguito filtro di convoluzione unsharpen'"<<endl; 
+    
  return bitMap;
    
  }
@@ -548,7 +586,9 @@ Il costruttore semplicemente copia nei capi dati della classe i valori ononimi.
 	  bitMap[i*this->lunghezza*3+j] =applyRGBConvolution(copia,kernel,i,j,div);
 	}
     }
- 
+
+ cout<<"Eseguito filtro di convoluzione edge detect'"<<endl;   
+  
  return bitMap;
    
  }
@@ -586,7 +626,8 @@ Il costruttore semplicemente copia nei capi dati della classe i valori ononimi.
 	  bitMap[i*this->lunghezza*3+j] =applyRGBConvolution(copia,kernel,i,j,div);
 	}
     }
- 
+ cout<<"Eseguito filtro di convoluzione box blur'"<<endl; 
+    
  return bitMap;
    
  }
@@ -624,7 +665,9 @@ Il costruttore semplicemente copia nei capi dati della classe i valori ononimi.
 	  bitMap[i*this->lunghezza*3+j] =applyRGBConvolution(copia,kernel,i,j,div);
 	}
     }
- 
+
+ cout<<"Eseguito filtro di convoluzione sobel orizzontale'"<<endl;     
+    
  return bitMap;
    
  }
@@ -662,8 +705,102 @@ Il costruttore semplicemente copia nei capi dati della classe i valori ononimi.
 	  bitMap[i*this->lunghezza*3+j] =applyRGBConvolution(copia,kernel,i,j,div);
 	}
     }
+  cout<<"Eseguito filtro di convoluzione sobel verticale'"<<endl;  
  
  return bitMap;
+   
+ }
+ 
+
+/**
+ *
+ * Metodo che ritorna una bitMap a cui è stato eseguito il filtro richiesto 
+ *
+ * 0 Nessun filtro
+ * 1 luminosita
+ * 2 gamma
+ * 3 contrasto
+ * 4 coloreInverso
+ * 5 solarise
+ * 6 scalaDiGrigi
+ * 7 blur
+ * 8 gaussianBlur
+ * 9 boxBlur
+ * 10 sharpen
+ * 11 unsharpen
+ * 12 edgeDetect
+ * 13 sobelHorizontal
+ * 14 sobelVertical
+ */ 
+ 
+ unsigned char* ImageFilter::eseguiFiltro(int filtro){
+  
+   switch(filtro){
+     
+     case 0:
+       return bitMap;
+     break;
+     
+     case 1:  
+       return luminosita(scala);
+     break;
+     
+     case 2:  
+       return gamma(scala);
+     break;
+     
+     case 3:  
+       return contrasto(scala);
+     break;
+     
+     case 4:  
+       return coloreInverso();
+     break;
+     
+     case 5:  
+       return solarise(scala);
+     break;
+     
+     case 6:  
+       return scalaDiGrigi();
+     break;
+     
+     case 7:  
+       return blur();
+     break;
+     
+     case 8:  
+       return gaussianBlur();
+     break;
+     
+     case 9:  
+       return boxBlur();
+     break;
+     
+     case 10:  
+       return sharpen();
+     break;
+     
+     case 11:  
+       return unsharpen();
+     break;
+     
+     case 12:  
+       return edgeDetect();
+     break;
+     
+     case 13:  
+       return sobelHorizontal();
+     break;
+     
+     case 14:  
+       return sobelVertical();
+     break;
+     
+     
+   }
+   
+   
    
  }
 
