@@ -13,13 +13,12 @@ class BitMapRGB{
 private:
 	unsigned char* bitMap;
 	int offsetIMG, larghezza, altezza;
-	int color;			// 24 bit per ogni pixel
+	int color=24;			// 24 bit per ogni pixel
 public:
-	BitMapRGB(char* nomeFileIn, int offset, int larg, int alt,int col){
+	BitMapRGB(char* nomeFileIn, int offset, int larg, int alt){
 		offsetIMG = offset;
 		larghezza = larg;
 		altezza = alt;
-		color=col;
 		int LungRow;
 		int LungRowData = (larghezza*color)/8;												// Byte per riga, con solo i pixel (senza zeri)
 		if (LungRowData%4 !=0)
@@ -30,6 +29,8 @@ public:
 		cout << "LungRow: " << LungRow << " LungRowData: " << LungRowData <<" \t larghezza in px: "<< larghezza <<endl;
 		
 		FILE *puntFile;
+		
+	
 		puntFile = fopen(nomeFileIn,"rb");
 		if(puntFile == NULL) {
 			cout << "Errore nell'apertura del file " << nomeFileIn << " !\n";
@@ -37,20 +38,22 @@ public:
 			}
 		fseek(puntFile, offset, 0);
 		unsigned char rigaBitMap[LungRow];
-		bitMap = new unsigned char[LungRowData*altezza];
-		
+		bitMap = new unsigned char[LungRow*altezza];
+
 		int l=fread(rigaBitMap, sizeof(unsigned char), LungRow, puntFile);
-		for(int i=0; i<LungRowData; i++)			// copio i dati che mi interessano nella bitMap
+		for(int i=0; i<LungRowData; i++){			// copio i dati che mi interessano nella bitMap
 			bitMap[i] = rigaBitMap[i];
-		
+		}
 		int riga=0;
 		while ((l == LungRow)&&(riga<altezza)){ 	// controllo anche che non vada oltre l'altezza, altrimenti rischia di crashare perché scrive fuori dalla bitMap!
 			riga++;
 			l=fread(rigaBitMap, sizeof(unsigned char), LungRow, puntFile);		// leggo la riga di dati dal file
 			for(int i=0; i<LungRowData; i++){									// copio in bitMap i dati sui pixel
 				bitMap[LungRowData*riga+i] = rigaBitMap[i];
+
 			}
 		}
+
 		fclose(puntFile);
 	}
 	

@@ -22,15 +22,11 @@ Parametri privati della classe Image Filter
 /**
  * Funzioni private della classe
  *
- * applyMonoConvolution: applica una convoluzione, utilizzando la matrice kernel 3x3, su un immagine su scala di grigi
  * applyRGBConvolution: applica una convoluzione, utilizzando la matrice kernel 3x3, su un immagine applyRGBConvolution
- * returnMonoPixel: ritorna il pixel in posizione i,j di una immagine su scala di grigi
  * returnRGBPixel: ritorna il pixel in posizione i,j di una immagine RGB
  *
  */   
    int applyRGBConvolution(unsigned char*,float kernel[3][3],int,int,int);
-   int applyMonoConvolution(unsigned char*,float kernel[3][3],int,int,int);
-   unsigned char returnMonoPixel(unsigned char*,int,int);
    unsigned char returnRGBPixel(unsigned char*,int,int);
    
 public:

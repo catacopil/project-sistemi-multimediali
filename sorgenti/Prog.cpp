@@ -23,25 +23,24 @@ int main(int argc, char *argv[]){
     short headerColor;
     int headerOffset, headerLarg, headerAlt, headerDimIMG;
     
-    char* nomeFileIn = "img/img400x300.bmp";
+    char* nomeFileIn = "img/kimi512.bmp";
     //char* nomeFileIn = "kimi512.bmp";
 	char* nomeFileOut = "img/output.bmp";
     Header* mioHeader = new Header(nomeFileIn);
 	mioHeader->stampaInfoHeader();
-	
+
 	// creo la bitMap che viene letta direttamente dal file indicato
-	BitMapRGB* mioBitMap = new BitMapRGB(nomeFileIn, mioHeader->getOffsetIMG(), mioHeader->getLarghezza(), mioHeader->getAltezza(),mioHeader->getColor());
-	
+	BitMapRGB* mioBitMap = new BitMapRGB(nomeFileIn, mioHeader->getOffsetIMG(), mioHeader->getLarghezza(), mioHeader->getAltezza());
 
 
 	
 	ImageFilter* img=new ImageFilter(mioBitMap->getBitMap(),mioHeader->getAltezza(),mioHeader->getLarghezza(),mioHeader->getColor());
 	
-/*	unsigned char*  bm = new unsigned char[mioHeader->getAltezza()*mioHeader->getLarghezza()*3];
-	bm=img->blur();
+	unsigned char*  bm = new unsigned char[mioHeader->getAltezza()*mioHeader->getLarghezza()*3];
+	bm=img->sobelVertical();
 	
 	mioBitMap->setBitMap(bm);
-	*/
+	
 //	mioHeader->setColor(8);
 	
 	
