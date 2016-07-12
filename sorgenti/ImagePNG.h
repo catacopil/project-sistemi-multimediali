@@ -6,13 +6,12 @@
  * 
  **/
 
-
 class ImagePNG{
 
 private:
 	unsigned int larghezza, altezza;
-	vector<unsigned char> png;			// tutti i byte del png
-	vector<unsigned char> pixel; 		// tutti i byte dei pixel
+	std::vector<unsigned char> png;			// tutti i byte del png
+	std::vector<unsigned char> pixel; 		// tutti i byte dei pixel
 	unsigned char* bitMapRGB; 				// contiene i valori RGB
 	unsigned char* bitMapAlpha;				// contiene i valori Alpha
 	int dimBitMap;
