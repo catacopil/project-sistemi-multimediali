@@ -15,10 +15,9 @@ Parametri privati della classe Image Filter
 @param bitMap: contiene la Bit Map dell'immagine
 @param altezza: contiene l'altezza dell'immagine
 @param lunghezza: contiene la lunghezza dell'immagine
-@param bitColor: contiene il numero di bit per colore utilizzati dall'immagine
 **/  
    unsigned char* bitMap;
-   int altezza,lunghezza,bitColor;
+   int altezza,lunghezza;
 /**
  * Funzioni private della classe
  *
@@ -53,7 +52,7 @@ public:
    * sobelVertical: applica un filtro di sobel verticale sull'immagine
    */
   
-  ImageFilter(unsigned char*,int,int,int);
+  ImageFilter(unsigned char*,int,int);
   
   //Filtri puntuali
   unsigned char* luminosita(double);

@@ -34,14 +34,15 @@ int main(int argc, char *argv[]){
 
 
 	
-	ImageFilter* img=new ImageFilter(mioBitMap->getBitMap(),mioHeader->getAltezza(),mioHeader->getLarghezza(),mioHeader->getColor());
+	ImageFilter* img=new ImageFilter(mioBitMap->getBitMap(),mioHeader->getAltezza(),mioHeader->getLarghezza());
 	
 	unsigned char*  bm = new unsigned char[mioHeader->getAltezza()*mioHeader->getLarghezza()*3];
-	bm=img->sobelVertical();
+	bm=img->sobelVertical(100);
+	
+
 	
 	mioBitMap->setBitMap(bm);
-	
-//	mioHeader->setColor(8);
+
 	
 	
 	
