@@ -5,7 +5,7 @@ LDFLAGS =
 
 
 
-OBJ =  Parser.o  ImageFilter.o ImagePNG.o main.o 
+OBJ =  Parser.o  ImageFilter.o ImagePNG.o BitMapRGB.o Header.o main.o 
 
 
 %.o: %.cpp

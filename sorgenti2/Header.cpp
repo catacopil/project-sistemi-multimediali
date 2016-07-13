@@ -1,25 +1,10 @@
 
-#include <stdio.h>
-#include <stdlib.h>
-#include <iostream>
-#include <fstream>
+#include "Header.h"
+
 using namespace std;
 
-#define DIM_HEADER_INIZIALE 54
-#define DIM_PALETTE 1024
 
-class Header{
-private:
-    unsigned char headerContent[DIM_HEADER_INIZIALE];       // contiene tutti i byte dell'Header (ad eccezione della Palette)
-    unsigned char paletteContent[DIM_PALETTE];				// contiene tutti i byte della Palette
-	char firma[2],piani[2];
-    short color;
-    int dimensione_totale, riservato, offset, header_size, larghezza, altezza, compressione, dimensione_immagine;
-    int ris_orizzontale,ris_verticale,pallete1,pallete2;
-	bool esistePalette;
-    
-public:
-    Header(char* nomeFile){				// Costruttore che legge l'intero Header (si presume sia quello standard da 54 Byte)
+	Header::Header(char* nomeFile){				// Costruttore che legge l'intero Header (si presume sia quello standard da 54 Byte)
         
 		FILE *puntFile;
         puntFile = fopen(nomeFile,"rb");
@@ -95,49 +80,49 @@ public:
 		fclose(puntFile);											// chiusura del file
 	}
 
-	int getDimensioneTot(){					// get e set per le dimensioni e l'offset immagine
+	int Header::getDimensioneTot(){					// get e set per le dimensioni e l'offset immagine
 		return dimensione_totale;
 	}
 	
-	int getLarghezza(){
+	int Header::getLarghezza(){
 		return larghezza;
 	}
 	
-	int getAltezza(){
+	int Header::getAltezza(){
 		return altezza;
 	}
 	
-	int getColor(){
+	int Header::getColor(){
 		return color;
 	}
 	
-	int getOffsetIMG(){
+	int Header::getOffsetIMG(){
 		return offset;
 	}
 	
-	void setLarghezza(int newLarg){
+	void Header::setLarghezza(int newLarg){
 		larghezza = newLarg;
 		dimensione_totale = larghezza*altezza*color/8;				// aggiorno anche la dimensione_totale dell'immagine
 	}
 	
-	void setAltezza(int newAlt){
+	void Header::setAltezza(int newAlt){
 		altezza = newAlt;
 		dimensione_totale = larghezza*altezza*color/8;				// aggiorno anche la dimensione_totale dell'immagine
 	}
 
-	void setOffset(int newOffset){
+	void Header::setOffset(int newOffset){
 		offset = newOffset;
 	}
 		
-	void setDimensioneTot(int newDim){
+	void Header::setDimensioneTot(int newDim){
 		dimensione_totale = newDim;
 	}
 	
-	void setColor(int newColor){
+	void Header::setColor(int newColor){
 		color = newColor;
 	}
 	
-	void stampaInfoHeader(){					// stampa nella console le informazioni dell'header
+	void Header::stampaInfoHeader(){					// stampa nella console le informazioni dell'header
 		cout<<"---------  Informazioni Header   --------\n";
 		cout<<"Firma: "<<firma[0]<<firma[1]<<endl;
 		cout<<"Dimensione totale: "<<dimensione_totale<<endl;
@@ -157,7 +142,7 @@ public:
 		cout << "---------------------------------------\n";
 	}
 	
-	void scriviHeader(char* nomeFile){	
+	void Header::scriviHeader(char* nomeFile){	
 	// scrive l'Header nel nuovo file, a partire da quello che aveva letto inizialmente, riscrive sempre le dimensioni e l'offset immagine
 	
 		ofstream fileout;
@@ -189,4 +174,3 @@ public:
 		  }
 		fileout.close();
 	}
-};

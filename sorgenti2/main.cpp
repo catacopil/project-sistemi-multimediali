@@ -13,9 +13,9 @@
 #include <iostream>
 
 #include "Parser.h"
-#include "Header.cpp"
+#include "Header.h"
 #include "ImagePNG.h"
-#include "BitMapRGB.cpp"
+#include "BitMapRGB.h"
 #include "ImageFilter.h"
 
 
