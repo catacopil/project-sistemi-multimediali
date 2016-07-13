@@ -23,6 +23,7 @@ public:
 	int getAltezza();
 	void setLarghezza(int);
 	void setAltezza(int);
+	void ridimensiona(int, int);
 	unsigned char* getBitMapRGB();				// ritorna la bitMap contenente i valori RGB dei pixel
 	unsigned char* getBitMapAlpha();			// ritorna la bitMap contenente i valori Alpha dei pixel
 	void setBitMapRGB(unsigned char*);

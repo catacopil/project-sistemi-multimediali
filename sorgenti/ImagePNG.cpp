@@ -47,13 +47,37 @@ int ImagePNG::getAltezza(){
 }
 
 void ImagePNG::setLarghezza(int newLarg){
+	// TODO: da cancellare...si usa ridimensiona(larg, alt)
 	larghezza = newLarg;
-	// TODO: c'è altro da settare?
 }
 
 void ImagePNG::setAltezza(int newAlt){
+	// TODO: da cancellare...si usa ridimensiona(larg, alt)
 	altezza = newAlt;
-	// TODO: c'è altro da settare?
+}
+
+void ImagePNG::ridimensiona(int newLarg, int newAlt){
+	// TODO: implementare la soluzione utilizzata nella bitMapRGB
+	// ATTENZIONE, SI IPOTIZZA CHE IL RIDIMENSIONAMENTO VIENE FATTO PRIMA DEL SALVATAGGIO (dopo il ridimensionamento bitMapRGB e bitMapAlpha non sono aggiornati)
+	if (larghezza==newLarg && altezza==newAlt)
+			return;
+	vector<unsigned char> newBitMap (newLarg*newAlt*4);
+	double scaleWidth =  (double)newLarg / (double)larghezza;
+    double scaleHeight = (double)newAlt / (double)altezza;
+	int x2, y2;
+	for (int i=0;i<newAlt;i++) {
+		for (int j=0;j<newLarg;j++) {
+			int punto = (i * (newLarg *4)) + (j*4);
+			int nearestMatch =  (((int)(i / scaleHeight) * (altezza *4)) + ((int)(j / scaleWidth) *4) );
+			newBitMap[punto    ] =  pixel[nearestMatch    ];
+			newBitMap[punto + 1] =  pixel[nearestMatch + 1];
+			newBitMap[punto + 2] =  pixel[nearestMatch + 2];
+			newBitMap[punto + 3] =  pixel[nearestMatch + 3];
+			}                
+		}
+	larghezza = newLarg;
+	altezza = newAlt;
+	pixel = newBitMap;
 }
 
 unsigned char* ImagePNG::getBitMapRGB(){
