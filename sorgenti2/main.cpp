@@ -49,15 +49,17 @@ if(argc==7 || argc==6){
 		if(parser->getFiltro()!=-1){
 			bitMapOut = img->eseguiFiltro(parser->getFiltro());
 			mioPNG->setBitMapRGB(bitMapOut);
-			
 		}
 		else
 			cout<<"ERRORE! FILTRO NON RICONOSCIUTO"<<endl;		
 		
-		mioPNG->ridimensiona(parser->getLunghezzaOutput(), parser->getAltezzaOutput());
-		
-		//TODO CONVERSIONE SE RICHIESTO
-		mioPNG->scriviPNG(parser->getOutputName());
+		mioPNG->ridimensiona(parser->getLunghezzaOutput(), parser->getAltezzaOutput());		
+
+		if (parser->getOutputFormat()==1){
+			mioPNG->scriviBMPconHeader(parser->getOutputName());
+		}
+		else if (parser->getOutputFormat()==2)
+			mioPNG->scriviPNG(parser->getOutputName());
 	}
 	else if (parser->getInputFormat() == 1){			// IMMAGINE BMP
 		Header* mioHeader = new Header(parser->getInputFileName());
@@ -86,13 +88,16 @@ if(argc==7 || argc==6){
 	
 		char* nomeFileOut=parser->getOutputName();
 		
-		
-		//TODO CONVERSIONE SE RICHIESTO		
-		mioHeader->scriviHeader(nomeFileOut);			// scrittura header (anche la Palette se c'è)
-		mioBitMap->scriviBitMap(nomeFileOut);			// stampo nel file di destinazione la bitMap
+		if (parser->getOutputFormat()==2){
+			// faccio la conversione e scrivo il PNG
+			ImagePNG* mioPNG = new ImagePNG(mioBitMap->getBitMap(), mioHeader->getLarghezza(), mioHeader->getAltezza());
+			mioPNG->scriviPNG(parser->getOutputName());
+		}
+		else{
+			mioHeader->scriviHeader(nomeFileOut);			// scrittura header (anche la Palette se c'è)
+			mioBitMap->scriviBitMap(nomeFileOut);			// stampo nel file di destinazione la bitMap
+		}
 	}
-    
-	  
 	  
 	  cout << " -----   FINE  PROGRAMMA  ----- \n";
 	  

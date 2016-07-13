@@ -27,10 +27,9 @@ private:
 	
 public:
 	ImagePNG(char*);						// inizializza l'oggetto con un PNG da un nomeFile passato per argomento
+	ImagePNG(unsigned char*, int, int);				// inizializza l'oggetto con una bitMap BMP già pronta e con le dimensioni dell'immagine
 	int getLarghezza();
 	int getAltezza();
-	void setLarghezza(int);
-	void setAltezza(int);
 	void ridimensiona(int, int);
 	unsigned char* getBitMapRGB();				// ritorna la bitMap contenente i valori RGB dei pixel
 	unsigned char* getBitMapAlpha();			// ritorna la bitMap contenente i valori Alpha dei pixel
@@ -38,6 +37,5 @@ public:
 	void setBitMapAlpha(unsigned char*);
 	
 	void scriviPNG(char*);					// scrive il PNG in un determinato file di output
-	
-
+	void scriviBMPconHeader(char*);
 };
