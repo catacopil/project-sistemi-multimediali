@@ -116,6 +116,13 @@ unsigned char* ImagePNG::getBitMapAlpha(){
 
 void ImagePNG::setBitMapRGB(unsigned char* newBitMapRGB){
 	bitMapRGB = newBitMapRGB;
+	for(int i=0,j=0; i<dimBitMap; i++){				// reimposto il vector pixel con i byte RGBA
+		if ((j+1)%4==0){	
+			j++;
+		}
+		pixel[j] = newBitMapRGB[i];
+		j++;
+	}
 }
 
 void ImagePNG::setBitMapAlpha(unsigned char* newBitMapAlpha){

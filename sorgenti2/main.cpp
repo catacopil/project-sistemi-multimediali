@@ -46,14 +46,17 @@ if(argc==7 || argc==6){
 		unsigned char* bitMapOut = new unsigned char[larg*alt*3];
 		bitMapPNG = mioPNG->getBitMapRGB();
 		ImageFilter* img=new ImageFilter(bitMapPNG,alt,larg,parser->getScala());
-		if(parser->getFiltro()!=-1)
+		if(parser->getFiltro()!=-1){
 			bitMapOut = img->eseguiFiltro(parser->getFiltro());
+			mioPNG->setBitMapRGB(bitMapOut);
+			
+		}
 		else
 			cout<<"ERRORE! FILTRO NON RICONOSCIUTO"<<endl;		
 		
-		//TODO: SISTEMARE RIDIMENSIONAMENTO !!!
 		mioPNG->ridimensiona(parser->getLunghezzaOutput(), parser->getAltezzaOutput());
 		
+		//TODO CONVERSIONE SE RICHIESTO
 		mioPNG->scriviPNG(parser->getOutputName());
 	}
 	else if (parser->getInputFormat() == 1){			// IMMAGINE BMP
@@ -83,6 +86,8 @@ if(argc==7 || argc==6){
 	
 		char* nomeFileOut=parser->getOutputName();
 		
+		
+		//TODO CONVERSIONE SE RICHIESTO		
 		mioHeader->scriviHeader(nomeFileOut);			// scrittura header (anche la Palette se c'è)
 		mioBitMap->scriviBitMap(nomeFileOut);			// stampo nel file di destinazione la bitMap
 	}
