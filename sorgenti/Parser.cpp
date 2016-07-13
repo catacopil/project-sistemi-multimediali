@@ -101,7 +101,7 @@ char* Parser::getOutputName(){
      return 10;
    if(this->filtro=="unsharpen")
      return 11;
-   if(this->filtro=="edgeDetect")
+   if(this->filtro=="edgedetect")
      return 12;
    if(this->filtro=="sobelhorizontal")
      return 13;

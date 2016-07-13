@@ -40,7 +40,6 @@ if(argc==7 || argc==6){
 	if (parser->getInputFormat() == 2){				// IMMAGINE PNG
 		ImagePNG* mioPNG = new ImagePNG(parser->getInputFileName());
 		
-		img// applicazione di qualche filtro
 		int larg = mioPNG->getLarghezza();
 		int alt = mioPNG->getAltezza();
 		unsigned char* bitMapPNG = new unsigned char[larg*alt*3];

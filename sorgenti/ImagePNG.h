@@ -1,4 +1,11 @@
 
+#include <stdio.h>
+#include <stdlib.h>
+#include <iostream>
+#include <vector>
+#include "lodepng.cpp"
+
+
 /**
  * 
  * La classe ImagePNG si occupa di gestire le immagini PNG, gestisce la lettura/scrittura dell'intero file (Header e Bitmap)
