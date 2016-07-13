@@ -98,7 +98,7 @@ public:
 		for (int i=0;i<newAlt;i++) {
 				for (int j=0;j<newLarg;j++) {
 					int pixel = (i * (newLarg *3)) + (j*3);
-					int nearestMatch =  (((int)(i / scaleHeight) * (altezza *3)) + ((int)(j / scaleWidth) *3) );
+					int nearestMatch =  (((int)(i / scaleHeight) * (larghezza *3)) + ((int)(j / scaleWidth) *3) );
 					newBitMap[pixel    ] =  bitMap[nearestMatch    ];
 					newBitMap[pixel + 1] =  bitMap[nearestMatch + 1];
 					newBitMap[pixel + 2] =  bitMap[nearestMatch + 2];
