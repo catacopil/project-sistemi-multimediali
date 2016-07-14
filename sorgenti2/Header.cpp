@@ -3,7 +3,12 @@
 
 using namespace std;
 
-
+/**
+ * Il costruttore della classe Header legge l'intero header dell'immagine BMP indicata da nomeFileIn e memorizza nei campi dati della classe le informazioni
+ * 
+ * @param nomeFileIn: nome del file BMP da leggere
+ * 
+ */
 	Header::Header(char* nomeFile){				// Costruttore che legge l'intero Header (si presume sia quello standard da 54 Byte)
         
 		FILE *puntFile;
@@ -71,13 +76,13 @@ using namespace std;
 			if (palette_standard){
 				cout << "Ok, palette standard \n";
 				fseek(puntFile, DIM_PALETTE, 0);
-				fread(paletteContent, DIM_PALETTE, 1, puntFile);
+				fread(paletteContent, DIM_PALETTE, 1, puntFile);				// legge la palette e la memorizza in paletteContent
 			}
 			else
 				cout << "Attenzione: dimensione Palette diversa da "<<DIM_PALETTE<<endl;
 		}
 		
-		fclose(puntFile);											// chiusura del file
+		fclose(puntFile);
 	}
 
 	int Header::getDimensioneTot(){					// get e set per le dimensioni e l'offset immagine
@@ -113,10 +118,6 @@ using namespace std;
 	void Header::setOffset(int newOffset){
 		offset = newOffset;
 	}
-		
-	void Header::setDimensioneTot(int newDim){
-		dimensione_totale = newDim;
-	}
 	
 	void Header::setColor(int newColor){
 		color = newColor;
@@ -142,8 +143,13 @@ using namespace std;
 		cout << "---------------------------------------\n";
 	}
 	
-	void Header::scriviHeader(char* nomeFile){	
-	// scrive l'Header nel nuovo file, a partire da quello che aveva letto inizialmente, riscrive sempre le dimensioni e l'offset immagine
+/**
+ * Metodo che scrive lo Header in un file .bmp indicato dall'argomento
+ * @param nomeFile: nome del file nel quale scrivere la bitMap
+ * 
+ * Il metodo riscrive l'intero header memorizzato alla lettura dentro la variabile headerContent, successivamente sovrascrive le informazioni relative a dimensioni, offset e color
+ */
+	void Header::scriviHeader(char* nomeFile){
 	
 		ofstream fileout;
 		fileout.open(nomeFile, ios::out | ios::binary);
